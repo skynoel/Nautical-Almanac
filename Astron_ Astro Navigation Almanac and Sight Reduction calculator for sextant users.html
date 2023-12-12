@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)https://friendsofthevigilance.org.uk/Astron/Astron.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Astron: Astro Navigation Almanac and Sight Reduction calculator for sextant users</title>
+    <meta name="description" content="This free program is both an Almanac and a Sight Reduction calculator for Astro Navigation using a sextant.">
+    <link rel="stylesheet" href="./Astron_ Astro Navigation Almanac and Sight Reduction calculator for sextant users_files/Astron.css">
+    <script src="./Astron_ Astro Navigation Almanac and Sight Reduction calculator for sextant users_files/Astron.js.下載"></script>
+<script src="chrome-extension://jhffgcfmcckgmioipfnmbannkpncfipo/util.js"></script><script src="chrome-extension://jhffgcfmcckgmioipfnmbannkpncfipo/pagejs.js"></script><script type="text/javascript" charset="UTF-8" src="./Astron_ Astro Navigation Almanac and Sight Reduction calculator for sextant users_files/common.js.下載"></script><script type="text/javascript" charset="UTF-8" src="./Astron_ Astro Navigation Almanac and Sight Reduction calculator for sextant users_files/util.js.下載"></script></head>
+
+<!--
+====== Element id prefixes ======
+// These are used to infer the use of the element and do not necessarily correspond with the class.
+
+div.    <div> element
+tbl.    <table> element
+
+info.   Calculated output on a plain (table) background.
+calc.   Calculated output on a light green background.
+res.    Result output on a dark green background.
+
+us.     User select input. (Drop down list).
+ui.     User input. Usually verified by an onchange function in events.js
+uib.    User input background. Usually <td> cell holding .us or .ui to ensure all cell same background colour
+uih.    Header / legend to an adjacent us or ui cell
+uis.    Subsidiary user input/select
+
+btn.    Click to activate/toggle etc. Could be either <button> or input [type=button] 
+
+pop.    Cell only displayed when certain condition met (often mouseover). (warn, caut excluded)
+warn.   Blank unless warning condition
+caut.   Blank unless caution condition
+adv.    Blank unless advisory condition
+spec.   Special type. See associated comments
+-->
+
+<body onload="Initialise()" onkeydown="KeydownListener(this, event)" data-new-gr-c-s-check-loaded="14.1078.0" data-gr-ext-installed="">
+    <!-- onload= prevents Initialise starting until all HTML and JavaScript loaded -->
+    <!-- function KeydownListener()
+        (a) globally discards unwanted tabbing
+            (except from input or select elements that have their own listeners)
+        (b) globally causes 'alt-h' to return to Home Page
+    -->
+    
+    <!-- Loading message displayed until hidden by Initialise() -->
+    <div id="divStartUp" class="HomePageReady"><br><br>One moment please<br><br>Astron is loading</div>
+    
+    <!-- Home Page table
+        : hidden during loading
+        : set to class .HomePage by Initialise()
+    -->
+    <table id="tblHomePage" class="HomePage">
+        <!-- location.href returning from other pages points to tblHomePage id -->  
+
+        <!-- Row 1 -->
+        <!-- This row looks like a yellow top border, but is a row so we can put text therein! -->
+        <!-- .HomePage css sets left & right yellow borders but 0 height top/bottom borders -->
+        <tbody><tr class="FalseBorder">
+            <td colspan="3" class="Header2">ASTRON: Integrated Astro Navigation Software</td>
+            <td></td>
+            <td colspan="2" class="Header2">Home Page</td>
+            <td class="smallText">V2.228 2022 Aug 05</td>
+            <td colspan="2"><button id="btnUserNotes" class="btnUserNotes">User Notes, etc</button></td>
+        </tr>
+
+        <!-- Row 2 no longer used: subtract 1 from following rows -->
+
+        <!-- Row 3 -->
+        <tr>
+            <td colspan="2" class="Header2 textLeft tabL">Date and Time Input</td>
+            <td colspan="3" class="uih noBottomBorder">
+                <select id="usTimeMode" class="SettingHeaderBackground bold" size="1">
+                    <option value="USE_UTC">Watch Date / Time in UTC</option>
+                    <option value="USE_SHIPS_TIME">Watch Date / Time in Ship's Time</option>
+                </select>
+            </td>
+            <td></td>
+            <td class="uih noBottomBorder">Watch Corr</td>
+            <td></td>
+            <td class="uih noBottomBorder">Daylight</td>
+        </tr>
+
+        <!-- Row 4 -->
+        <tr>
+            <td class="uih noRightBorder">Year</td>
+            <td class="uih noLeftBorder noRightBorder">Month</td>
+            <td class="uih noLeftBorder noRightBorder noTopBorder">Day</td>
+            <td class="uih noLeftBorder noRightBorder noTopBorder">Hour</td>
+            <td class="uih noLeftBorder noRightBorder noTopBorder">Minute</td>
+            <td class="uih noLeftBorder">Second</td>
+            <td class="uih noTopBorder">Secs (Slow +ve)</td>
+            <td class="uih">
+                <select id="usZoneType" class="SettingHeaderBackground">
+                    <option value="USE_TIME_ZONES">Time Zone</option>
+                    <option value="USE_ZONE_DESC">Zone Descr</option>
+                </select></td>
+            <td class="uih noTopBorder">Saving</td>
+        </tr>
+
+        <!-- Row 5 -->
+        <tr>
+            <td class="uib">
+                <input id="uiYear" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event,&#39;uiMonth&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiMonth" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiDay&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiDay" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiHour&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiHour" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiMinute&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiMinute" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiSecond&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiSecond" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiWatch&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiWatch" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiZoneValue&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiZoneValue" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usDaylight&#39;)" autocomplete="off">
+            </td>
+
+            <td class="uib">
+                <select id="usDaylight" class="us" onblur="InputBlur(this)" onkeydown="SelectKeyDown(this, event, &#39;usChooseBody&#39;)" onfocus="InputFocus(this)">
+                    <option value="NONE">None</option>
+                    <option value="PLUS_1">+1 hour</option>
+                </select>
+            </td>
+        </tr>
+
+        <!-- Row 6 -->
+        <tr>
+            <td colspan="6"></td>
+            <td id="infoDeltaT_Text" class="Setting">Delta-T: 70.0 secs</td>  <!-- class set dynamically -->
+            <td>
+                <input id="uiDeltaT" onblur="InputBlurSubsiduary(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiYear&#39;)" autocomplete="off" class="hidden">
+            </td>
+            <td></td>
+        </tr>
+
+        <!-- Row 7 -->
+        <tr>
+            <td class="Header2 textLeft tabL">Body Data</td>
+            <td id="infoMagnitudeH1">Equation</td>
+            <td>GHA of</td>
+            <td class="Setting">
+                <select id="usSHAorRA" class="Setting">
+                    <option value="RA">RA of</option>
+                    <option value="SHA">SHA of</option>
+                </select>
+            </td>
+            <td>GHA of</td>
+            <td>Dec of</td>
+            <td colspan="3" id="infoUTC_Text" class="bordered padL textLeft faded">UTC: Wed  31 Aug 2022 05:51:39 </td>
+        </tr>
+
+        <!-- Row 8 -->
+        <tr>
+            <td class="uih">Body: </td>
+            <td id="infoMagnitudeH2">of Time</td>
+            <td>Aries</td>
+            <td id="infoBodyName1">Sun</td>
+            <td id="infoBodyName2">Sun</td>
+            <td id="infoBodyName3">Sun</td>
+            <td id="infoST_Text" colspan="3" class="calc bold padL textLeft borderStrong">Ship's Time: Wed  31 Aug 2022 05:51:39  (UTC +0.0)</td>
+        </tr>
+
+        <!-- Row 9 -->
+        <tr>
+            <td class="uib">
+                <select id="usChooseBody" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;uiLat_deg&#39;)">
+                    <!-- Body pick list populated by PopulateWithBodyNames() -->
+                <option>Sun</option><option>Moon</option><option>Mercury</option><option>Venus</option><option>Mars</option><option>Jupiter</option><option>Saturn</option><option>Acamar</option><option>ACHERNAR</option><option>ACRUX</option><option>ADHARA</option><option>ALDEBARAN</option><option>Alioth</option><option>Alkaid</option><option>Alnair</option><option>Alnilam</option><option>Alphard</option><option>Alphecca</option><option>Alpheratz</option><option>ALTAIR</option><option>Ankaa</option><option>ANTARES</option><option>ARCTURUS</option><option>Atria</option><option>Avior</option><option>Bellatrix</option><option>BETELGEUSE</option><option>CANOPUS</option><option>CAPELLA</option><option>DENEB</option><option>Denebola</option><option>Diphda</option><option>Dubhe</option><option>Elnath</option><option>Eltanin</option><option>Enif</option><option>FOMALHAUT</option><option>Gacrux</option><option>Gienah</option><option>HADAR</option><option>Hamal</option><option>Kaus_Aust</option><option>Kochab</option><option>Markab</option><option>Menkar</option><option>Menkent</option><option>Miaplacidus</option><option>Mirfak</option><option>Nunki</option><option>Peacock</option><option>Polaris</option><option>POLLUX</option><option>PROCYON</option><option>Rasalhague</option><option>REGULUS</option><option>RIGEL</option><option>RIGIL_KENT</option><option>Sabik</option><option>Schedar</option><option>Shaula</option><option>SIRIUS</option><option>SPICA</option><option>Suhail</option><option>VEGA</option><option>Zuben_ubi</option></select></td>
+            <td id="calcMagnitude" class="calc">-0<sup>m</sup> 25<sup>s</sup></td>
+            <td id="calcGHA_Aries" class="calc">067° 18.4′</td>
+            <td id="calcSHA_Body" class="calc">200° 30.0′</td>
+            <td id="calcGHA_Body" class="result">267° 48.4′</td>
+            <td id="calcDec_Body" class="result">N08° 38.0′</td>
+            <td colspan="3" id="TwilightHeader" class="borderTopThick borderLeftThick"> 31 Aug Ship's Date &amp; Time.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sun &lt; -3.0° &amp; &gt; -9.0°</td>
+        </tr>
+
+        <!-- Row 10 -->
+        <tr>
+            <td id="infoPolarisLat1" class="hidden"></td>
+            <td colspan="5"></td>
+            <td class="Setting borderLeftThick padR textRight">Observation</td>
+            <td colspan="2" id="calcAM_Window" class="calc textLeft padL">AM: 04:42 until 05:15</td>
+        </tr>
+
+            <!-- Row 11 -->
+        <tr>
+            <td id="infoPolarisLat2" class="hidden"></td>
+            <td colspan="5"></td>
+            <td class="Setting borderLeftThick padR textRight borderBottomThick">Windows</td>
+            <td colspan="2" id="calcPM_Window" class="calc textLeft padL borderBottomThick">PM: 18:45 until 19:18</td>
+        </tr>
+
+        <!-- Row 12 -->
+        <tr>
+            <td class="Header2 textLeft tabL" colspan="2">Apparent Body Position</td>
+            <td colspan="4"></td>
+            <td class="borderLeftThick borderTop"></td>
+            <td class="vAlignBottom">Bearing (°T)</td>
+            <td class="vAlignBottom">Altitude (°)</td>
+        </tr>
+
+        <!-- Row 13 -->
+        <tr>
+            <td class="uih noBottomBorder">Assumed</td>
+            <td class="uih noBottomBorder">Assumed</td>
+            <td colspan="4"></td>
+            <td class="borderLeftThick padR textRight">Unidentified body?</td>
+            <td class="uih"><input id="uisBearing" class="uis" onblur="InputBlurSubsiduary(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event,&#39;uisAltitude&#39;)" autocomplete="off">
+            </td>
+            <td class="uih"><input id="uisAltitude" class="uis" onblur="InputBlurSubsiduary(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event,&#39;uisBearing&#39;)" autocomplete="off">
+            </td>
+        </tr>
+
+        <!-- Row 14 -->
+        <tr>
+            <td class="uih noTopBorder">Latitude</td>
+            <td class="uih noTopBorder">Longitude</td>
+            <td colspan="4"></td>
+            <td id="infoUB_Name" class="bordered noTopBorder borderLeftThick padR textRight borderBottomThick">DENEB</td>
+            <td id="infoUB_Azm" class="bordered borderBottomThick">320</td>
+            <td id="infoUB_Alt" class="bordered borderBottomThick">12</td>
+        </tr>
+
+        <!-- Row 15 -->
+        <tr>
+            <td class="faint">
+                <input id="uiLat_deg" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiLat_Mins&#39;)" autocomplete="off">
+                Deg
+            </td>
+            <td class="faint">
+                <input id="uiLong_deg" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiLong_Mins&#39;)" autocomplete="off">
+                Deg
+            </td>
+            <td></td>
+            <td></td>
+            <td>Calculated</td>
+            <td>Calculated</td>
+            <td class="borderLeftThick textRight">
+                <select id="usShowSextantArcBetweenBodies" class="Setting textLastRight" size="1">
+                    <option dir="rtl" value="SextantArc">Sextant Arc</option>
+                    <option dir="rtl" value="GeocentricArc">Geocentric Arc</option>
+                </select>
+            </td>
+            <td id="infoBodyName7" class="borderTop padL">Sun</td>
+            <td>
+                <select id="usChooseArcBody" class="uih " size="1" onkeydown="SelectKeyDown(this, event, &#39;usSelBodyArcLimb&#39;)">
+                <option>Sun</option><option>Moon</option><option>Mercury</option><option>Venus</option><option>Mars</option><option>Jupiter</option><option>Saturn</option><option>Acamar</option><option>ACHERNAR</option><option>ACRUX</option><option>ADHARA</option><option>ALDEBARAN</option><option>Alioth</option><option>Alkaid</option><option>Alnair</option><option>Alnilam</option><option>Alphard</option><option>Alphecca</option><option>Alpheratz</option><option>ALTAIR</option><option>Ankaa</option><option>ANTARES</option><option>ARCTURUS</option><option>Atria</option><option>Avior</option><option>Bellatrix</option><option>BETELGEUSE</option><option>CANOPUS</option><option>CAPELLA</option><option>DENEB</option><option>Denebola</option><option>Diphda</option><option>Dubhe</option><option>Elnath</option><option>Eltanin</option><option>Enif</option><option>FOMALHAUT</option><option>Gacrux</option><option>Gienah</option><option>HADAR</option><option>Hamal</option><option>Kaus_Aust</option><option>Kochab</option><option>Markab</option><option>Menkar</option><option>Menkent</option><option>Miaplacidus</option><option>Mirfak</option><option>Nunki</option><option>Peacock</option><option>Polaris</option><option>POLLUX</option><option>PROCYON</option><option>Rasalhague</option><option>REGULUS</option><option>RIGEL</option><option>RIGIL_KENT</option><option>Sabik</option><option>Schedar</option><option>Shaula</option><option>SIRIUS</option><option>SPICA</option><option>Suhail</option><option>VEGA</option><option>Zuben_ubi</option></select> 
+            </td>
+        </tr>
+        
+        <!-- Row 16 -->
+        <tr>
+            <td class="faint">
+                <input id="uiLat_Mins" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usLat_NS&#39;)" autocomplete="off">
+                M.m
+            </td>
+            <td class="faint">
+                <input id="uiLong_Mins" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usLong_EW&#39;)" autocomplete="off">
+                M.m
+            </td>
+            <td>LHA of</td>
+            <td>LHA of</td>
+            <td id="infoBodyName5">Sun</td>
+            <td id="infoBodyName6">Sun</td>
+            <td id="InfoArc2" class="borderLeftThick textRight padR">Moon below 0°.</td>
+            <td class="uih">
+                <select id="usSelectedBodyArcLimb" class="hidden" onblur="InputBlurSubsiduary(this)" onkeydown="SelectKeyDown(this, event, &#39;usArcBodyArcLimb&#39;)" onfocus="InputFocus(this)">
+                <option value="NEAR">Near limb</option>
+                <option value="CENTRE">Centre</option>
+                <option value="FAR">Far limb</option>
+                </select></td>
+            <td class="uih">
+                <select id="usArcBodyArcLimb" class="hidden" onblur="InputBlurSubsiduary(this)" onkeydown="SelectKeyDown(this, event, &#39;usSelectedBodyArcLimb&#39;)" onfocus="InputFocus(this)">
+                <option value="NEAR">Near limb</option>
+                <option value="CENTRE">✘ Centre</option>
+                <option value="FAR">✘ Far limb</option>
+                </select></td>
+        </tr>
+
+        <!-- Row 17 -->
+        <tr>
+            <td class="uib">
+                <select class="us" id="usLat_NS" onblur="InputBlur(this)" onkeydown="SelectKeyDown(this, event, &#39;uiLong_deg&#39;)" onfocus="InputFocus(this)">
+                    <option value="N">N</option>
+                    <option value="S">S</option>
+                </select>
+            </td>
+            <td class="uib">
+                <select id="usLong_EW" class="us" onblur="InputBlur(this)" onkeydown="SelectKeyDown(this, event, &#39;uiSextant_deg&#39;)" onfocus="InputFocus(this)">
+                    <option value="E">E</option>
+                    <option value="W">W</option>
+                </select>
+            </td>
+            <td>Aries</td>
+            <td id="infoBodyName4">Sun</td>
+            <td>Azimuth (Zn)</td>
+            <td>Altitude (Hc)</td>
+            <td colspan="3" id="infoHomePageGLD" class="borderThick">Sun: Geocentric Lunar Distance: 045° 59.3′</td>
+        </tr>
+
+        <!-- Row 18 -->
+        <tr>
+            <td id="calcAssLat" class="calc">N40° 00.0′</td> <!-- prevents table display staggering during loading-->
+            <td id="calcAssLong" class="calc">E000° 00.0′</td>
+            <td id="calcLHA_Aries" class="calc">067° 18.4′</td>
+            <td id="calcLHA_Body" class="calc">267° 48.4′</td>
+            <td id="resZn" class="result">082.0°</td>
+            <td id="resHc" class="result">03° 52.2′</td>
+            <td colspan="3"></td>
+        </tr>
+
+        <!-- Row 19.. (blank except when valid Lunar Opportunity -->
+        <tr>
+            <td></td><!-- colspan="6" gives lower border to right hand 3 cells!!! -->
+            <td colspan="5">&nbsp;</td><!-- &nbsp needed to avoid zero height row when other values are all "" -->
+            <td id="popLunarOppOnHomePage" colspan="3" class="LunarPossibleHomePage"></td>
+        </tr>
+
+        <!-- Row 20 -->
+        <tr class="header_row"> 
+            <td class="Header2 textLeft tabL" colspan="2">Sextant Altitude Corrections</td>
+            <td class="uih noBottomBorder">Observer Alt</td>
+            <td colspan="3"></td>
+            <td colspan="3" id="popMerPassOpp" class="MerPassPossible"></td>
+        </tr>
+
+        <!-- Row 21 -->
+        <tr>
+            <td class="uih noBottomBorder">Sextant</td>
+            <td class="uih noBottomBorder">Index</td>
+            <td class="uih noTopBorder">
+                <input id="uiObsAltitude" class="uih noBorders textCentre" onblur="InputBlurSubsiduary(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiHoE&#39;)" autocomplete="off" style="color: black; font-weight: normal;">
+            </td>
+            <td id="infoEnteredTemp" class="uih" style="color: black;">MSL Temp</td>
+            <td id="infoEnteredPress" class="uih" style="color: black;">MSL Press</td>
+            <td rowspan="2" id="specPhaseImageCell" style="background-color: cornflowerblue;">
+                <canvas id="cvsPhaseImage" class="cvsPhaseImage" height="40" width="80"></canvas>
+                <!-- canvas is 40px high, 80px wide, central within double row cell-->
+            </td>
+            <td>SD</td>
+            <td>HP</td>
+            <td></td>
+        </tr>
+
+        <!-- Row 22 -->
+        <tr>
+            <td class="uih noTopBorder">Altitude (Hs)</td>
+            <td class="uih noBottomBorder noTopBorder">Correction (IC)</td>
+            <td class="uih">
+                <select id="usHeightUnits" class="SettingHeaderBackground" size="1">
+                    <option value="FEET">Feet</option>
+                    <option value="METRES">Metres</option>
+                </select>
+            </td>
+            <td class="uih">
+                <select id="usTemperatureUnits" class="SettingHeaderBackground" size="1">
+                    <option value="FAHRENHEIT">Fahrenheit</option>
+                    <option value="CELSIUS">Celsius</option>
+                </select>
+            </td>
+            <td class="uih">
+                <select id="usPressureUnits" class="SettingHeaderBackground" size="1">
+                    <option value="IN_HG">Inches Hg</option>
+                    <option value="HPA">hPa</option>
+                </select>
+            </td>
+            <!-- row span here -->
+            <td id="infoSD_min" class="calc">15.8′</td>
+            <td id="infoHP_min" class="calc">0.1′</td>
+            <td></td>
+        </tr>
+
+        <!-- Row 23 -->
+        <tr>
+            <td class="faint">
+                <input id="uiSextant_deg" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiSextant_Mins&#39;)" autocomplete="off">
+                Deg
+            </td>
+            <td class="uih noTopBorder">(Off Arc +ve)</td>
+            <td class="uih">Eye Height (HoE)</td>
+            <td id="infoStdTemp" class="uih" style="color: black;">(std 10°C)</td>
+            <td id="infoStdPress" class="uih" style="color: black;">(std 1010 hPa)</td>
+            <td class="uih">Limb</td>
+            <td id="infoSD_Legend" class="bordered noBottomBorder">SD Corr</td>
+            <td class="bordered noBottomBorder">Parallax Corr</td>
+            <td>Observed</td>
+        </tr>
+
+        <!-- Row 24 -->
+        <tr>
+            <td class="faint">
+                <input id="uiSextant_Mins" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiIC&#39;)" autocomplete="off">
+                M.m
+            </td>
+            <td class="faint">
+                <input id="uiIC" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiHoE&#39;)" autocomplete="off">
+                M.m
+            </td>
+            <td class="uib">
+                <input id="uiHoE" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiTemperature&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiTemperature" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiPressure&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <input id="uiPressure" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usSelBodyAltitudeLimb&#39;)" autocomplete="off">
+            </td>
+            <td class="uib">
+                <select id="usSelBodyAltitudeLimb" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event,&#39;uiYear&#39;)">
+                    <option value="UPPER">Upper</option>
+                    <option value="CENTRE">Centre</option>
+                    <option value="LOWER">Lower</option>
+                </select>
+            </td>
+            <td id="infoSD_Corr" class="bordered noTopBorder">-15.8′</td>
+            <td id="infoPxCorr" class="bordered noTopBorder">+0.1′</td>
+            <td>Altitude (Ho)</td>
+        </tr>
+
+        <!-- Row 25 -->
+        <tr>
+            <td id="calcHs" class="calc">50° 00.0′</td> <!-- prevents table display staggering during loading-->
+            <td id="calcH1" class="calc">50° 00.0′</td>
+            <td id="calcH2" class="calc">49° 56.9′</td>
+            <td></td>
+            <td id="calcH3" class="calc">49° 56.1′</td>
+            <td id="infoLimbAnomaly"></td>
+            <td id="calcH4" class="calc">49° 40.3′</td>
+            <td id="calcH5" class="calc">49° 40.4′</td>
+            <td id="calcHo" class="result">49° 40.4′</td>
+        </tr>
+
+        <!-- Row 26 -->
+        <tr>
+            <td colspan="2" id="warnSextantHorizonType" class="Warning"></td>
+            <td id="infoDip" class="bordered noBottomBorder">Dip Corr: -3.1′</td>
+            <td></td>
+            <td id="infoRefr" class="bordered">Refr Corr: -0.8′</td>
+            <td id="infoIllumAngle" class="bordered noTopBorder"></td>
+            <td colspan="3" id="infoTotalCorr">Total altitude correction: -19.6′</td>
+        </tr>
+
+        <!-- Row 27 -->
+        <tr>
+            <td class="Header2 textLeft tabL" colspan="2">Azimuth and Intercept</td>
+            <td id="infoHorizonDist" class="bordered">Horizon: 3.6nm.</td>
+            <td></td>
+            <td></td>
+            <td class="bordered noBottomBorder">Calculated Hs</td>
+            <td id="infoRiseSetHeader" colspan="3" class="bordered noBottomBorder borderTopThick borderLeftThick">Sun (UL).  31 Aug Ship's Date &amp; Time. HoE 3.0m</td>
+        </tr>
+
+        <!-- Row 28 -->
+        <tr>
+            <td id="resAzmAndIntercept" class="result" colspan="2">082.0°&nbsp;&nbsp;&nbsp;2748.1nm Towards</td>
+            <td></td> 
+            <td class="bordered noBottomBorder">Shore Dist (nm):</td>
+            <td class="uih"><input id="uiShoreDist" class="uis" value="" onblur="InputBlurSubsiduary(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event,&#39;uiSextant_Mins&#39;)" autocomplete="off"></td>
+            <td id="infoHomePageCalcHs" class="bordered noTopBorder">04° 22.1′</td>
+            <td class="borderLeftThick">Rise</td>
+            <td>Mer. Passage</td>
+            <td>Set</td>
+        </tr>
+
+        <!-- Row 29 -->
+        <tr>
+            <td colspan="2"></td>
+            <td></td>   <!-- colspan="3" creates unwanted upper border with Chrome! -->
+            <td id="uisDipShort" class="bordered noRightBorder noTopBorder"></td>
+            <td id="infoHsReduction" class="bordered noLeftBorder"></td>
+            <td>
+                <select id="usTimeSync" class="Setting" size="1">
+                <option value="OFF">Time Sync: OFF</option>
+                <option value="ON">Time Sync: ON</option>
+            </select></td>
+            
+            <td id="infoRiseShipsTime" class="bordered borderLeftThick borderBotttomThick">05:26:24</td>
+            <td id="infoTransitShipsTime" class="bordered borderBotttomThick">12:00:21</td>
+            <td id="infoSetShipsTime" class="bordered borderBotttomThick">18:33:36</td>
+        </tr>
+
+        <!-- Row 30 Home Page Menu Tabs -->   
+        <tr>
+            <td><input type="button" id="btnJumpSightLog" class="btnJumpSightLog" value="Log / Plotter" autocomplete="off"></td>
+            <td><input type="button" id="btnAddSight" value="Add sight?" autocomplete="off" class="btnFadedAddSight"></td>
+            <td><input type="button" id="btnJumpPlanner" class="btnJumpPlanner" value="Planner / Sky Chart" autocomplete="off"></td>
+            <td><input type="button" id="btnJumpAlmanac" class="btnJumpAlmanac" value="Almanac" autocomplete="off"></td>
+            <td><input type="button" id="btnJumpSettings" class="btnJumpSettings" value="Settings" autocomplete="off"></td>
+            <td><input type="button" id="btnHomePageSetPresentTime" class="btnHomePageSetPresentTime" value="Present Date/Time" autocomplete="off"></td>
+            <td><input type="button" id="btnJumpLunar" class="btnJumpLunar" value="Lunar Sight" autocomplete="off"></td>
+            <td><input type="button" id="btnJumpMerPass" class="btnJumpMerPass" value="Mer. Passage" autocomplete="off"></td>
+            <td><input type="button" id="btnJumpStarInfo" class="btnJumpStarInfo" value="Star Info" autocomplete="off"></td>
+        </tr>
+
+         <!-- Row 31 (Yellow botton line of table) -->
+         <!-- Inhibit this line and instate below test code when required -->
+        <tr><td colspan="9" class="FalseBorder"></td></tr>
+        
+        <!-- Extra rows available for showing test values only 
+        ... css height (all) 5px to show 10px lower border. Height overridden when data written to any cell  -->
+
+        <tr id="TestCellsRow1" class="FalseBorder heightTestCells">
+            <td id="Test1"></td>
+            <td id="Test2"></td>
+            <td id="Test3"></td>
+            <td id="Test4"></td>
+            <td id="Test5"></td>
+            <td id="Test6"></td>
+            <td id="Test7"></td>
+            <td id="Test8"></td>
+            <td id="Test9"></td>
+        </tr>
+        <tr id="TestCellsRow2" class="FalseBorder heightTestCells">
+            <td id="Test11"></td>
+            <td id="Test12"></td>
+            <td id="Test13"></td>
+            <td id="Test14"></td>
+            <td id="Test15"></td>
+            <td id="Test16"></td>
+            <td id="Test17"></td>
+            <td id="Test18"></td>
+            <td id="Test19"></td>
+        </tr>
+     
+    </tbody></table>
+
+    <!-- Popup Div for Jupiter supplementary info.
+         Visibility set by PhaseImageCell listener
+         Location set by css .divJupiterPopUp -->
+    <div id="divJupiterPopUp" class="hidden">
+    </div>
+
+    <!-- User Notes Popup.
+         Initially hidden, Revealed by Home Page function UserNotes(), hidden by CloseUserNotes()
+         Location set by css .divUserNotes -->
+    <div id="divUserNotes" class="hidden">
+        <!-- button to close this popup. A child of divUserNotes -->
+        <div id="btnCloseUserNotes" class="CloseUserNotes bordered">
+            Close X
+        </div>
+        <!-- Pop up text -->
+        <br>In order to download Astron's comprehensive User Notes,<br>
+        1: Copy (Ctrl-C) the below link.<br>
+        2: Select a new browser tab and paste it (Ctrl-V) to the address bar.<br>
+        3. Your browser will download the file to your downloads folder.<br>
+        <br>
+        <span style="color: Green; font-weight: bold;">https://friendsofthevigilance.org.uk/Astron/AstronUserNotes.docx</span><br>
+        <br>
+        We use the above indirect link method to avoid occasional browser security issues.<br>
+        We suggest that you then save the file for easy future access.<br>
+        <br>
+        =================================================================<br>
+        <br>
+        The following link accesses a folder from which you can ...<br>
+         (a) Run a PowerPoint presentation explaining using Astron's main features<br>
+         (b) Run a PowerPoint presentation explaining Lunar Lines of Position<br>
+         (c) Download the entire Astron source code<br>
+         <span style="color: Green; font-weight: bold;">https://1drv.ms/u/s!AmHmuHfpzqdqhJ8Q4-PKAiFu8K3mSQ?e=c4aMbK</span><br>
+        <br>
+        =================================================================<br>
+        <br>
+        <span style="font-size: 80%;">
+        You may also be interested in the writer's celestial navigation slide rule emulator programs.<br><br>
+        TRADITIONAL BYGRAVE SLIDE RULE emulator.<br>
+        https://friendsofthevigilance.org.uk/Astron/SlideRules/TraditionalBygrave/TraditionalBygrave.html
+        <br><br>
+        MODERN BYGRAVE SLIDE RULE emulator (C) Gary LaPook.<br>
+        https://friendsofthevigilance.org.uk/Astron/SlideRules/ModernBygrave/ModernBygrave.html
+        <br><br>
+        CONVENTIONAL LINEAR SLIDE RULE emulator<br>
+        https://friendsofthevigilance.org.uk/Astron/SlideRules/LinearSlideRule/SlideRule.html<br>
+        </span>
+    </div>
+
+    <div class="FalsePage"></div>
+
+
+
+    
+
+
+<!-- SIGHT LOG / PLOTTER PAGE -->
+   
+    <div id="divSightLog" class="width100pc"> <!-- Home Page Tab seeks this div id -->
+
+        <!-- Header, time display & return button -->
+        <div class="inLine"><h1>ASTRON SIGHT LOG AND PLOTTER</h1></div>
+        <div id="calcSightLogDateTime" class="inLine calc textRight padLR">Ship's Time: Wed  31 Aug 2022 05:51:39  (UTC +0.0)</div>
+        <div class="inLine">
+            <input id="btnSightLogJumpHomePage" class="btnJumpHomePage padLR" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+    
+        
+        <div><!-- Sight Log table (created dynamically)-->
+            <table id="tblSightLog"><tbody><tr><td id="SightLogHeaderEmpty">No sights to display</td></tr></tbody></table>
+        </div>
+
+        <!-- Subsidiary table for pop-ups immediately below -->
+        <div>
+            <table style="background: Grey">
+                <tbody><tr><td id="InterpolatedMoonText"></td></tr>
+                <tr><td id="InterpolatedBodyText"></td></tr>
+                <tr><td id="BestFitSightText"></td></tr>
+            </tbody></table>
+        </div>
+        
+
+        <div> <!-- Astron chart on left, fix time table on right-->
+            <div class="inLine"> <!-- Astron chart -->
+                <!-- Header to Astron chart -->
+                <table id="tblAstronChartHeader" width="600"><!-- width set dynamically -->
+                    <tbody><tr>
+                        <td id="btnLargeDecrease" class="btn bold"> &lt;&lt;</td>
+                        <td id="btnSmallDecrease" class="btn bold"> &lt;</td>
+                        <td id="ChartWidth" class="calc width25pc"></td>
+                        <td id="btnSmallIncrease" class="btn bold"> &gt;</td>
+                        <td id="btnLargeIncrease" class="btn bold"> &gt;&gt;</td>
+                        <td class="background"></td>
+                        <td id="ChartCentre" class="calc width50pc">&nbsp;&nbsp;</td>
+                    </tr>
+                </tbody></table>
+                
+                <!-- Astron chart -->
+                <canvas id="cvsAstronChart" tabindex="0" width="600" height="400">
+                    <!-- width & height set by SightLog() -->
+                    <!-- tabindex=0 needed to make onevent items work with canvas. No idea why!-->
+                    <!-- Hint found in stackoverflow.com. He didn't know why either!-->
+                    <!-- width & height set by SightLog(). Must be 600/400px -->
+                </canvas>
+                
+                <!-- Footer to Astron chart: Mouse position and chart centre indicators -->
+                <table id="tblAstronChartFooter" width="600"><!-- width set dynamically -->
+                    <tbody><tr>
+                        <td id="MousePosition" class="calc"></td>
+                    </tr>
+                </tbody></table>
+            </div>
+
+            
+            <!-- Fix Time input table on right -->
+            <div class="inLine vAlignBottom">
+                <table id="tblFixTimeInput" class="hidden">
+                    <tbody><tr>
+                        <td id="FixTimeHeader" colspan="2" class="calc padLR"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered bold">Change fix time</td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padded">Day</td>
+                        <td class="uib" style="width: 1px">
+                            <select id="usFixDay" class="us" onblur="InputBlur(this)" onkeydown="SelectKeyDown(this, event, &#39;uiFixHour&#39;)" onfocus="InputFocus(this)">
+                                <option value="0">&nbsp;</option> <!--  All values set by SightLog.js .. nbsp to silenceHTML checker! --> 
+                                <option selected="" value="1">&nbsp;</option>
+                                <option value="2">&nbsp;</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">Hour</td>
+                        <td class="uib">
+                            <input id="uiFixHour" class="ui" value="0" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiFixMinute&#39;)" autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">Minute</td>
+                        <td class="uib">
+                            <input id="uiFixMinute" class="ui" value="0" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiFixSecond&#39;)" autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">Second</td>
+                        <td class="uib">
+                            <input id="uiFixSecond" class="ui" value="0" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiFixHour&#39;)" autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered bold">Change COG/SOG</td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">COG (Degs T)</td>
+                        <td class="uib">
+                            <input id="uiSightLogCOG" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiSightLogSOG&#39;)" autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">SOG (Knots)</td>
+                        <td class="uib">
+                            <input id="uiSightLogSOG" class="ui" onblur="SetSOGStyles()" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiSightLogCOG&#39;)" autocomplete="off" style="color: black; background-color: coral; font-weight: normal;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td id="FixTimeHeader4" colspan="2" class="bordered bold">Mark Location</td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">Latitude</td>
+                        <td class="uib">
+                            <input id="uiMarkLocationLat" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiMarkLocationLong&#39;)" autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="uih textRight padLR">Longitude</td>
+                        <td class="uib">
+                            <input id="uiMarkLocationLong" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiMarkLocationLat&#39;)" autocomplete="off">
+                        </td>
+                    </tr>
+                </tbody></table>
+            </div>
+        </div>
+
+        <br> <!-- Gap between divs-->
+
+        <div> <!-- Google Map -->
+            <div class="width20pc central"><!-- Show it button -->
+            <input type="button" id="btnShowGoogleMap" class="hidden" value="Download Google Map" autocomplete="off">
+            </div>
+            <!-- Load Google Maps API. Note &callback=DrawChartGoogle at end of key -->
+            <script async="" defer="" src="./Astron_ Astro Navigation Almanac and Sight Reduction calculator for sextant users_files/js">
+            </script>
+            <!-- Dedicated div for Google Map -->
+            <div id="divGoogleMap" class="GoogleMap"></div>
+            <!-- Footer -->
+            <table id="tblGoogleMapFooter" width="600">
+                <tbody><tr>
+                    <td id="GoogleMousePosition" class="calc">&nbsp;</td>
+                </tr>
+            </tbody></table>
+        </div>
+    </div>
+
+
+
+
+
+
+    <div class="FalsePage"></div>
+
+
+
+
+
+
+
+<!-- PLANNER PAGE -->
+    <div id="divPlanner"> <!-- Home Page Tab seeks this div id -->
+
+        <!-- 3 inline Header divs-->
+        <div id="divPlannerDateTime" class="inLine calc padLR">Ship's Time: Wed  31 Aug 2022 05:51:39  (UTC +0.0)</div>
+        <div class="inLine"><h1>&nbsp;ASTRON SIGHT PLANNER &amp; SKY CHART</h1></div>
+        <div class="inLine">
+            <input id="btnPlannerJumpHomePage" class="btnJumpHomePage padLR" type="button" value="Return to Home Page" autocomplete="off">
+        </div>
+        
+        <div> <!-- Three item main display -->
+
+            <!-- Time adjust (and other info) table on left of SphereView -->
+            <div class="inLine vAlignTop">
+                
+                <table>
+                    <!-- ALat / ALong box -->
+                    <tbody><tr>
+                        <td class="bordered textRight padR">Lat</td>
+                        <td colspan="3" id="infoPlannerLat" class="calc textRight padR">N40° 00.0′</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Long</td>
+                        <td colspan="3" id="infoPlannerLong" class="calc textRight padLR">E000° 00.0′</td>
+                    </tr><!-- blank row -->
+                    <tr>
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+                    
+                    <!-- Time adjust box -->
+                    <tr>
+                        <td id="infoPlannerTimeMode" colspan="4" class="calc">SHIP'S TIME</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Year</td>
+                        <td id="infoPlannerYear" class="bordered textRight padLR">2022</td>
+                        <td id="btnPlannerYearMinus" class="btn textRight padLR">&nbsp;-</td>
+                        <td id="btnPlannerYearPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Month</td>
+                        <td id="infoPlannerMonth" class="bordered textRight padLR">8</td>
+                        <td id="btnPlannerMonthMinus" class="btn textRight padLR">-</td>
+                        <td id="btnPlannerMonthPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Day</td>
+                        <td id="infoPlannerDay" class="bordered textRight padLR">31</td>
+                        <td id="btnPlannerDayMinus" class="btn textRight padLR">-</td>
+                        <td id="btnPlannerDayPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Hour</td>
+                        <td id="infoPlannerHour" class="bordered textRight padLR">5</td>
+                        <td id="btnPlannerHourMinus" class="btn textRight padLR">-</td>
+                        <td id="btnPlannerHourPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Minute</td>
+                        <td id="infoPlannerMinute" class="bordered textRight padLR">51</td>
+                        <td id="btnPlannerMinuteMinus" class="btn textRight padLR">-</td>
+                        <td id="btnPlannerMinutePlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Second</td>
+                        <td id="infoPlannerSecond" class="bordered textRight padLR">39</td>
+                        <td class="hidden"></td>
+                        <td class="hidden"></td>
+                    </tr>
+                    <tr><!-- blank row -->
+                        <td class="background bordered" colspan="4">&nbsp;</td>
+                    </tr>
+
+                    <!-- Set time button -->
+                    <tr>
+                        <td colspan="4" id="btnPlannerSetCurrentTime" class="btn">Present Date/Time</td>
+                    </tr>
+                    <!-- blank row -->
+                    <tr>
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+                    
+                    <!-- Sun / Moon indicator -->
+                    <tr>
+                        <td colspan="2" class="bordered textRight padLR">Sun Altitude</td>
+                        <td colspan="2" id="PlannerSunAlt" class="SunInDaylightText">04°</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered textRight padLR">Moon Altitude</td>
+                        <td colspan="2" id="PlannerMoonAlt" class="MoonAtNightText">-39°</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered textRight padLR">Moon Phase</td>
+                        <td colspan="2" id="PlannerMoonPhase" class="MoonAtNightText">15% (+)</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4" class="background">&nbsp;</td> <!-- blank row -->
+                    </tr>
+
+                    <!-- View button. -->
+                    <tr>
+                        <td colspan="4">
+                            <select id="usPlannerView" class="SettingHeaderBackground width100pc" size="1" onkeydown="SelectKeyDown(this, event, &#39;usPlannerView&#39;)">
+                                <option value="PLAN_VIEW">Plan View</option>
+                                <option value="SKY_VIEW">Sky View</option>
+                                <option value="LINEAR_VIEW">Linear View</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="background" colspan="4">&nbsp;</td> <!-- blank row -->
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="popLunarOppOnPlannerPage1" class="LunarPossiblePlannerPage"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="popLunarOppOnPlannerPage2" class="LunarPossiblePlannerPage"></td>
+                    </tr>
+                    <tr>
+                        <td class="background" colspan="4">&nbsp;</td> <!-- blank row -->
+                    </tr>
+                </tbody></table>
+            </div>
+
+            <!-- Sky Chart in centre -->
+            <div id="divSkyChart" class="inLine vAlignTop">
+                <!-- Size set by tblPlanner() -->
+                <canvas id="SkyChart" tabindex="0" width="600" height="600">
+                    <!-- Size also set by tblPlanner() -->
+                    <!-- tabindex=0 needed to make onevent items work with canvas.
+                    No idea why! Hint found in stackoverflow.com. He didn't know why either!-->
+                </canvas>
+            </div>
+
+            <!-- Planner table on extreme right  (or below if overflow) -->
+            <div class="inLine vAlignTop">
+                <table id="tblPlanner"><tbody><tr><td id="Planner_col0" class="bordered bold padLR">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Body&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td id="Planner_col1" class="bordered bold padLR">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td id="Planner_col2" class="bordered bold padLR">Azm(°)</td><td id="Planner_col3" class="bordered bold padLR">Alt(°)</td></tr><tr><td id="PlannerRow0col0" class="bordered textLeft padLR">Kochab</td><td id="PlannerRow0col1" class="bordered textRight padLR">2.1</td><td id="PlannerRow0col2" class="bordered padLR">007</td><td id="PlannerRow0col3" class="bordered padLR">25</td></tr><tr><td id="PlannerRow1col0" class="bordered textLeft padLR">Alkaid</td><td id="PlannerRow1col1" class="bordered textRight padLR">1.8</td><td id="PlannerRow1col2" class="bordered padLR">025</td><td id="PlannerRow1col3" class="bordered padLR">06</td></tr><tr><td id="PlannerRow2col0" class="bordered textLeft padLR">Alioth</td><td id="PlannerRow2col1" class="bordered textRight padLR">1.8</td><td id="PlannerRow2col2" class="bordered padLR">028</td><td id="PlannerRow2col3" class="bordered padLR">16</td></tr><tr><td id="PlannerRow3col0" class="bordered textLeft padLR">Dubhe</td><td id="PlannerRow3col1" class="bordered textRight padLR">1.8</td><td id="PlannerRow3col2" class="bordered padLR">033</td><td id="PlannerRow3col3" class="bordered padLR">31</td></tr><tr><td id="PlannerRow4col0" class="bordered textLeft padLR">CAPELLA</td><td id="PlannerRow4col1" class="bordered textRight padLR">0.1</td><td id="PlannerRow4col2" class="bordered padLR">052</td><td id="PlannerRow4col3" class="bordered padLR">79</td></tr><tr><td id="PlannerRow5col0" class="bordered textLeft padLR">Sun</td><td id="PlannerRow5col1" class="bordered textRight padLR"></td><td id="PlannerRow5col2" class="bordered padLR">082</td><td id="PlannerRow5col3" class="bordered padLR">04</td></tr><tr><td id="PlannerRow6col0" class="bordered textLeft padLR">REGULUS</td><td id="PlannerRow6col1" class="bordered textRight padLR">1.4</td><td id="PlannerRow6col2" class="bordered padLR">084</td><td id="PlannerRow6col3" class="bordered padLR">11</td></tr><tr><td id="PlannerRow7col0" class="bordered textLeft padLR">Venus</td><td id="PlannerRow7col1" class="bordered textRight padLR">-3.9</td><td id="PlannerRow7col2" class="bordered padLR">085</td><td id="PlannerRow7col3" class="bordered padLR">17</td></tr><tr><td id="PlannerRow8col0" class="bordered textLeft padLR">POLLUX</td><td id="PlannerRow8col1" class="bordered textRight padLR">1.1</td><td id="PlannerRow8col2" class="bordered padLR">091</td><td id="PlannerRow8col3" class="bordered padLR">48</td></tr><tr><td id="PlannerRow9col0" class="bordered textLeft padLR">Alphard</td><td id="PlannerRow9col1" class="bordered textRight padLR">2.1</td><td id="PlannerRow9col2" class="bordered padLR">106</td><td id="PlannerRow9col3" class="bordered padLR">06</td></tr><tr><td id="PlannerRow10col0" class="bordered textLeft padLR">PROCYON</td><td id="PlannerRow10col1" class="bordered textRight padLR">0.4</td><td id="PlannerRow10col2" class="bordered padLR">116</td><td id="PlannerRow10col3" class="bordered padLR">35</td></tr><tr><td id="PlannerRow11col0" class="bordered textLeft padLR">Elnath</td><td id="PlannerRow11col1" class="bordered textRight padLR">1.7</td><td id="PlannerRow11col2" class="bordered padLR">129</td><td id="PlannerRow11col3" class="bordered padLR">73</td></tr><tr><td id="PlannerRow12col0" class="bordered textLeft padLR">BETELGEUSE</td><td id="PlannerRow12col1" class="bordered textRight padLR">1.5</td><td id="PlannerRow12col2" class="bordered padLR">143</td><td id="PlannerRow12col3" class="bordered padLR">52</td></tr><tr><td id="PlannerRow13col0" class="bordered textLeft padLR">SIRIUS</td><td id="PlannerRow13col1" class="bordered textRight padLR">-1.5</td><td id="PlannerRow13col2" class="bordered padLR">144</td><td id="PlannerRow13col3" class="bordered padLR">25</td></tr><tr><td id="PlannerRow14col0" class="bordered textLeft padLR">ADHARA</td><td id="PlannerRow14col1" class="bordered textRight padLR">1.5</td><td id="PlannerRow14col2" class="bordered padLR">147</td><td id="PlannerRow14col3" class="bordered padLR">13</td></tr><tr><td id="PlannerRow15col0" class="bordered textLeft padLR">Alnilam</td><td id="PlannerRow15col1" class="bordered textRight padLR">1.6</td><td id="PlannerRow15col2" class="bordered padLR">155</td><td id="PlannerRow15col3" class="bordered padLR">46</td></tr><tr><td id="PlannerRow16col0" class="bordered textLeft padLR">Bellatrix</td><td id="PlannerRow16col1" class="bordered textRight padLR">1.6</td><td id="PlannerRow16col2" class="bordered padLR">155</td><td id="PlannerRow16col3" class="bordered padLR">54</td></tr><tr><td id="PlannerRow17col0" class="bordered textLeft padLR">RIGEL</td><td id="PlannerRow17col1" class="bordered textRight padLR">0.1</td><td id="PlannerRow17col2" class="bordered padLR">165</td><td id="PlannerRow17col3" class="bordered padLR">41</td></tr><tr><td id="PlannerRow18col0" class="bordered textLeft padLR">ALDEBARAN</td><td id="PlannerRow18col1" class="bordered textRight padLR">1.0</td><td id="PlannerRow18col2" class="bordered padLR">175</td><td id="PlannerRow18col3" class="bordered padLR">66</td></tr><tr><td id="PlannerRow19col0" class="bordered textLeft padLR">Mars</td><td id="PlannerRow19col1" class="bordered textRight padLR">-0.1</td><td id="PlannerRow19col2" class="bordered padLR">188</td><td id="PlannerRow19col3" class="bordered padLR">70</td></tr><tr><td id="PlannerRow20col0" class="bordered textLeft padLR">Acamar</td><td id="PlannerRow20col1" class="bordered textRight padLR">2.9</td><td id="PlannerRow20col2" class="bordered padLR">197</td><td id="PlannerRow20col3" class="bordered padLR">07</td></tr><tr><td id="PlannerRow21col0" class="bordered textLeft padLR">Menkar</td><td id="PlannerRow21col1" class="bordered textRight padLR">2.5</td><td id="PlannerRow21col2" class="bordered padLR">214</td><td id="PlannerRow21col3" class="bordered padLR">49</td></tr><tr><td id="PlannerRow22col0" class="bordered textLeft padLR">Diphda</td><td id="PlannerRow22col1" class="bordered textRight padLR">2.0</td><td id="PlannerRow22col2" class="bordered padLR">234</td><td id="PlannerRow22col3" class="bordered padLR">12</td></tr><tr><td id="PlannerRow23col0" class="bordered textLeft padLR">Jupiter</td><td id="PlannerRow23col1" class="bordered textRight padLR">-2.9</td><td id="PlannerRow23col2" class="bordered padLR">251</td><td id="PlannerRow23col3" class="bordered padLR">23</td></tr><tr><td id="PlannerRow24col0" class="bordered textLeft padLR">Hamal</td><td id="PlannerRow24col1" class="bordered textRight padLR">2.0</td><td id="PlannerRow24col2" class="bordered padLR">252</td><td id="PlannerRow24col3" class="bordered padLR">56</td></tr><tr><td id="PlannerRow25col0" class="bordered textLeft padLR">Markab</td><td id="PlannerRow25col1" class="bordered textRight padLR">2.5</td><td id="PlannerRow25col2" class="bordered padLR">276</td><td id="PlannerRow25col3" class="bordered padLR">17</td></tr><tr><td id="PlannerRow26col0" class="bordered textLeft padLR">Alpheratz</td><td id="PlannerRow26col1" class="bordered textRight padLR">2.0</td><td id="PlannerRow26col2" class="bordered padLR">280</td><td id="PlannerRow26col3" class="bordered padLR">37</td></tr><tr><td id="PlannerRow27col0" class="bordered textLeft padLR">Schedar</td><td id="PlannerRow27col1" class="bordered textRight padLR">2.2</td><td id="PlannerRow27col2" class="bordered padLR">314</td><td id="PlannerRow27col3" class="bordered padLR">50</td></tr><tr><td id="PlannerRow28col0" class="bordered textLeft padLR">Mirfak</td><td id="PlannerRow28col1" class="bordered textRight padLR">1.8</td><td id="PlannerRow28col2" class="bordered padLR">317</td><td id="PlannerRow28col3" class="bordered padLR">75</td></tr><tr><td id="PlannerRow29col0" class="bordered textLeft padLR">DENEB</td><td id="PlannerRow29col1" class="bordered textRight padLR">1.2</td><td id="PlannerRow29col2" class="bordered padLR">320</td><td id="PlannerRow29col3" class="bordered padLR">12</td></tr><tr><td id="PlannerRow30col0" class="bordered textLeft padLR">Eltanin</td><td id="PlannerRow30col1" class="bordered textRight padLR">2.2</td><td id="PlannerRow30col2" class="bordered padLR">346</td><td id="PlannerRow30col3" class="bordered padLR">03</td></tr><tr><td id="PlannerRow31col0" class="bordered textLeft padLR">Polaris</td><td id="PlannerRow31col1" class="bordered textRight padLR">2.0</td><td id="PlannerRow31col2" class="bordered padLR">000</td><td id="PlannerRow31col3" class="bordered padLR">41</td></tr></tbody></table>
+            </div>
+        </div>
+    </div> <!-- End of divPlanner -->
+
+
+    <div class="FalsePage"></div>
+
+
+    <!-- ALMANAC PAGE-->
+    <div id="divAlmanac"> <!-- Home Page Tab seeks this div id -->
+        <!-- Header, time display & return button -->
+        <div class="inLine"><h1>ASTRON ALMANAC PAGE</h1></div>
+        
+        <div class="inLine"> <!-- Home Page button -->
+            <input id="btnAlmanac1JumpHomePage" class="btnJumpHomePage padLR" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+        <div id="calcAlmanacDateTime" class="inLine calc textRight padLR">Ship's Time: Wed  31 Aug 2022 05:51:39  (UTC +0.0)</div>
+
+        <!-- Two block div for Almanac on left, data table on right -->
+        <div>
+            <!-- Almanac on left -->
+            <div class="inLine vAlignTop">
+                <table id="tblAlmanac"><tbody><tr><td id="AlmanacHeader_col0" class="bordered padded" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Body&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td id="AlmanacHeader_col1" class="bordered padded" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;Mag&nbsp;&nbsp;&nbsp;</td><td id="AlmanacHeader_col2" class="bordered padded" style="font-weight: bold;">SHA</td><td id="AlmanacHeader_col3" class="bordered padded" style="font-weight: bold;">GHA</td><td id="AlmanacHeader_col4" class="bordered padded" style="font-weight: bold;">Dec</td><td id="AlmanacHeader_col5" class="bordered padded" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;SD&nbsp;&nbsp;&nbsp;</td><td id="AlmanacHeader_col6" class="bordered padded" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;HP&nbsp;&nbsp;&nbsp;</td><td id="AlmanacHeader_col7" class="bordered padded" style="font-weight: bold;">LHA</td><td id="AlmanacHeader_col8" class="bordered padded" style="font-weight: bold;">Azm (Zn)</td><td id="AlmanacHeader_col9" class="bordered padded" style="font-weight: bold;">Alt (Hc)</td></tr><tr id="AlmanacRow1" style="background: lightcyan;"><td id="AlmanacRow1col0" class="bordered textLeft padded" style="font-weight: bold;">Sun</td><td id="AlmanacRow1col1" class="bordered textRight padded"></td><td id="AlmanacRow1col2" class="bordered textRight padded">200° 30.0′</td><td id="AlmanacRow1col3" class="bordered textRight padded">267° 48.4′</td><td id="AlmanacRow1col4" class="bordered textRight padded">N08° 38.0′</td><td id="AlmanacRow1col5" class="bordered textRight padded">15.8'</td><td id="AlmanacRow1col6" class="bordered textRight padded">0.1'</td><td id="AlmanacRow1col7" class="bordered textRight padded">267° 48.4′</td><td id="AlmanacRow1col8" class="bordered textRight padded">082.0°</td><td id="AlmanacRow1col9" class="bordered textRight padded">03° 52.2′</td></tr><tr id="AlmanacRow4" style="background: lightcyan;"><td id="AlmanacRow4col0" class="bordered textLeft padded" style="font-weight: bold;">Venus</td><td id="AlmanacRow4col1" class="bordered textRight padded">-3.9</td><td id="AlmanacRow4col2" class="bordered textRight padded">213° 23.9′</td><td id="AlmanacRow4col3" class="bordered textRight padded">280° 42.4′</td><td id="AlmanacRow4col4" class="bordered textRight padded">N14° 34.2′</td><td id="AlmanacRow4col5" class="bordered textRight padded">0.1'</td><td id="AlmanacRow4col6" class="bordered textRight padded">0.1'</td><td id="AlmanacRow4col7" class="bordered textRight padded">280° 42.4′</td><td id="AlmanacRow4col8" class="bordered textRight padded">085.4°</td><td id="AlmanacRow4col9" class="bordered textRight padded">17° 25.4′</td></tr></tbody></table>
+            </div>
+
+            <!-- Supp info table on right -->
+            <div class="inLine vAlignTop">
+                <table>
+                    <!-- ALat / ALong box -->
+                    <tbody><tr>
+                        <td class="bordered textRight padLR">Lat</td>
+                        <td colspan="3" id="calcAlmanacLat" class="calc textRight padLR">N40° 00.0′</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Long</td>
+                        <td colspan="3" id="calcAlmanacLong" class="calc textRight padLR">E000° 00.0′</td>
+                    </tr>
+                    <tr><!-- blank row -->
+                        <td colspan="4" class="background">&nbsp;</td> 
+                    </tr>
+
+                    <!-- Date/Time change -->
+                    <tr>
+                        <td id="infoAlmanacTimeMode" class="calc" colspan="4">SHIP'S TIME</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Year</td>
+                        <td id="infoAlmanacYear" class="bordered textRight padLR">2022</td>
+                        <td id="btnAlmanacYearMinus" class="btn textRight padLR">-</td>
+                        <td id="btnAlmanacYearPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Month</td>
+                        <td id="infoAlmanacMonth" class="bordered textRight padLR">8</td>
+                        <td id="btnAlmanacMonthMinus" class="btn textRight padLR">-</td>
+                        <td id="btnAlmanacMonthPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Day</td>
+                        <td id="infoAlmanacDay" class="bordered textRight padLR">31</td>
+                        <td id="btnAlmanacDayMinus" class="btn textRight padLR">-</td>
+                        <td id="btnAlmanacDayPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR">Hour</td>
+                        <td id="infoAlmanacHour" class="bordered textRight padLR">5</td>
+                        <td id="btnAlmanacHourMinus" class="btn textRight padLR">-</td>
+                        <td id="btnAlmanacHourPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR" rowspan="2">Minute </td>
+                        <td id="infoAlmanacMinute10" class="bordered textRight padLR" rowspan="2">51</td>
+                        <td id="btnAlmanacMinuteMinus10" class="btn textRight padLR">--</td>
+                        <td id="btnAlmanacMinutePlus10" class="btn textRight padLR">++</td>
+                    </tr>
+                    <tr>
+                        <td id="btnAlmanacMinuteMinus" class="btn textRight padLR">-</td>
+                        <td id="btnAlmanacMinutePlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padLR" rowspan="2">Second </td>
+                        <td id="infoAlmanacSecond10" class="bordered textRight padLR" rowspan="2">39</td>
+                        <td id="btnAlmanacSecondMinus10" class="btn textRight padLR">--</td>
+                        <td id="btnAlmanacSecondPlus10" class="btn textRight padLR">++</td>
+                    </tr>
+                    <tr>
+                        <td id="btnAlmanacSecondMinus" class="btn textRight padLR">-</td>
+                        <td id="btnAlmanacSecondPlus" class="btn textRight padLR">+</td>
+                    </tr>
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+
+                    <!-- Present time button -->
+                    <tr>
+                        <td colspan="4" id="btnAlmanacSetCurrentTime" class="btn">Present Date/Time</td>
+                    </tr>                    
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td> 
+                    </tr>
+
+                    <!-- Show above horizon only? -->
+                    <tr>
+                        <td colspan="4">
+                            <select id="usAlmanacView" class="SettingHeaderBackground width100pc" size="1" onkeydown="SelectKeyDown(this, event, &#39;usAlmanacView&#39;)">
+                                <option selected="" value="ABOVE_HORIZON">Show above horizon only</option>
+                                <option value="ALL">Include below horizon</option>
+                            </select>
+                        </td>
+                    </tr>                   
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+
+                    <!-- Show which group of bodies -->
+                    <tr>
+                        <td colspan="4">
+                            <select id="usShowWhichAlmanacBodies" class="SettingHeaderBackground width100pc" size="1" onkeydown="SelectKeyDown(this, event, &#39;usShowWhichAlmanacBodies&#39;)">
+                                <option value="SMP">Sun, Moon &amp; Planets</option>
+                                <option selected="" value="BRIGHT">Include BRIGHT stars</option>
+                                <option value="ALL">Include all stars</option>
+                            </select>
+                        </td>   
+                    </tr> 
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+                    
+                    <!-- Show in Daylight? -->
+                    <tr>
+                        <td colspan="4">
+                            <select id="usShowInDaylight" class="SettingHeaderBackground width100pc" size="1" onkeydown="SelectKeyDown(this, event, &#39;usShowInDaylight&#39;)">
+                                <option selected="" value="OMIT">Only ☉, ☽︎ &amp; ♀ in daylight</option>
+                                <option value="SHOW">Include all in daylight</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+
+                    <!-- Sun / Moon indicator -->
+                    <tr>
+                        <td colspan="2" class="bordered textRight padLR">Sun Altitude</td>
+                        <td colspan="2" id="AlmanacSunAlt" class="SunInDaylightText">04°</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered textRight padLR">Moon Altitude</td>
+                        <td colspan="2" id="AlmanacMoonAlt" class="MoonAtNightText">-39°</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bordered textRight padLR">Moon Phase</td>
+                        <td colspan="2" id="AlmanacMoonPhase" class="MoonAtNightText">15% (+)</td>
+                    </tr>
+
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+                       
+                    <!-- Aries data -->
+                    <tr>
+                        <td class="bordered" colspan="4">Aries</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padR">SHA</td>
+                        <td colspan="3" id="infoAlmanacAriesSHA" class="bordered textLeft padL">000° 00.0′</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padR">GHA</td>
+                        <td colspan="3" id="infoAlmanacAriesGHA" class="bordered textLeft padL">067° 18.4′</td>
+                    </tr>
+                    <tr>
+                        <td class="bordered textRight padR">LHA</td>
+                        <td colspan="3" id="infoAlmanacAriesLHA" class="bordered textLeft padL">067° 18.4′</td>
+                    </tr>
+                    <tr><!-- blank row -->
+                        <td class="background" colspan="4">&nbsp;</td>
+                    </tr>
+                </tbody></table>
+            </div>
+        </div>
+        
+        <br> <!-- Gap between divs -->
+
+        <!-- Second Home Page button-->
+        <div>
+            <!-- Centre button below offset table-->
+            <div>
+                <input id="btnAlmanac2JumpHomePage" class="btnJumpHomePage padLR central width20pc" type="button" value="Return to Home Page (Alt+h)" autocomplete="off" style="visibility: hidden;">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- End of Almanac -->
+
+
+
+
+
+
+
+   
+    <div class="FalsePage"></div>
+
+
+
+
+
+
+
+
+    <!-- SETTINGS PAGE-->
+    <div id="divSettings">  <!-- Home Page Tab seeks this div id -->
+        
+        <!-- Header -->
+        <div class="inLine"><h1>ASTRON SETTINGS PAGE</h1></div>
+        <div class="inLine">
+            <input id="btnSettingsJumpHomePage" class="btnJumpHomePage padLR" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+
+        <br><!-- blank row -->
+
+        <table class="width80pc">
+            <tbody><tr>
+                <td class="bordered textRight padded width20pc">TYPE OF HORIZON</td>
+                <td class="bordered width20pc">
+                    <select id="usHorizonType" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;uiToo_Light&#39;)">
+                        <option value="SEA">SEA</option>
+                        <option value="ARTIFICIAL">ARTIFICIAL</option>
+                        <option value="BUBBLE">BUBBLE</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">Default SEA. See User Notes Sections 15 &amp; 16 for other types.
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">TOO LIGHT SUN Hc</td>
+                <td class="bordered">
+                    <input id="uiToo_Light" class="ui width25pc" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiToo_Dark&#39;)" autocomplete="off">
+                </td>
+                <td class="bordered textLeft padded">
+                    Default and suggested value -3.0° (Mid Civil Twilight). Range 0.0° to -6.0°.
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">TOO DARK SUN Hc</td>
+                <td class="bordered">
+                    <input id="uiToo_Dark" class="ui width25pc" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usStartTime&#39;)" autocomplete="off">
+                </td>
+                <td class="bordered textLeft padded">
+                    Default and suggested value -9.0° (Mid Nautical Twilight). Range -6.0° to -20.0°.
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">TYPE OF <br> START UP</td>
+                <td class="bordered">
+                    <select id="usStartTime" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;uiExtraDigits&#39;)">
+                        <option value="LAST_USED">LAST_USED</option>
+                        <option value="PRESENT">PRESENT</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">
+                    LAST USED: Start with date/time set to last used values.<br>
+                    PRESENT: (Default). Start with date/time set to present time.<br>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">SHOW EXTRA DECIMALS</td>
+                <td class="bordered">
+                    <input id="uiExtraDigits" class="ui width25pc" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usShowSextantArcOnMaps&#39;)" autocomplete="off">
+                </td>
+                <td class="bordered textLeft padded">
+                    Recommended Value 0. Shows EXTRA decimal places. Range 0 to 3.<br>
+                    Formatting (including plotter and planner) may become ragged when &gt; 0.
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">SHOW LUNAR <br> ARC DISTANCE</td>
+                <td class="bordered">
+                    <select id="usShowSextantArcOnMaps" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;usUseMSLTnP&#39;)">
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">Show on legend bar below Astron and Google Sight Plotters<br>
+                    YES: Show sextant arc (LDs) between selected body and Moon at cursor position.<br>
+                    NO: (Default). Don't show it.
+                    <br>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="class=bordered textRight padded">MSL TEMPERATURE <br> AND PRESSURE</td>
+                <td class="bordered">
+                    <select id="usUseMSLTnP" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;usDeltaTMode&#39;)">
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">
+                    YES: (Default). Always enter MSL Temperature and Pressure.<br>
+                    NO: If Observer Alt &gt; 0, enter AMBIENT Temperature and Pressure.<br>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">DELTA-T</td>
+                <td class="bordered">
+                    <select id="usDeltaTMode" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;usMoonMethod&#39;)">
+                        <option value="AUTO">AUTO</option>
+                        <option value="MANUAL">MANUAL</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">
+                    AUTO: (Default.) Astron uses calculated value for ΔT.<br>
+                    MANUAL: User can enter a specific value on Home Page. Use 0 for Terrestrial Time. (TT/TD).<br>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">MOON CALCULATION METHOD</td>
+                <td class="bordered">
+                    <select id="usMoonMethod" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;uiTimeSyncOffset&#39;)">
+                        <option value="NORMAL">NORMAL</option>
+                        <option value="BASIC">BASIC</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">
+                    NORMAL: (Default and Recommended) Uses large data set, resulting in slower operation.<br>
+                    See User Notes Appendix 7 "Moon Accuracy".<br>
+                    BASIC: Astron uses shortened, but adequate, data set. Select this mode on slow devices.
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">TIME SYNC OFFSET</td>
+                <td class="bordered">
+                    <input id="uiTimeSyncOffset" class="ui width25pc" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;btnResetToDefaults&#39;)" autocomplete="off">
+                </td>
+                <td class="bordered textLeft padded">
+                    When Time Sync selected, time is synchronised with an offset of this amount.<br>
+                    Default and recommended value: 0 seconds.<br>
+                    Range -200s (Retarded) to +200s (Advanced).
+                </td>
+            </tr>
+
+            <tr>
+                <td class="bordered textRight padded">RESET ALL</td>
+                <td class="bordered">
+                    <input id="btnResetToDefaults" class="btnResetSettings width50pc textCentre" value="RESET ALL" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usShowCustomStarsss&#39;)" autocomplete="off">
+                </td>
+                <td class="bordered textLeft padded">Resets all settings, inputs and Custom Stars to default values.</td>
+            </tr>
+            
+            <tr>
+                <td class="bordered textRight padded">INCLUDE CUSTOM STARS</td>
+                <td class="bordered">
+                    <select id="usShowCustomStars" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;usHorizonType&#39;)">
+                        <option value="NONE">NONE</option>
+                        <option value="ONE">ONE</option>
+                        <option value="TWO">TWO</option>
+                    </select>
+                </td>
+                <td class="bordered textLeft padded">
+                    ONE or TWO: All utilities include the CUSTOM STAR(S) detailed in the pop-up table below.<br>
+                    NONE: (Default). CUSTOM STARS are hidden.<br>
+                </td>
+            </tr>
+        </tbody></table>
+    </div>
+
+    <div>&nbsp;</div> <!-- spacer line -->
+
+
+    <div class="width70pc central">
+        <table id="tblCustomStars" class="hidden">
+            <tbody><tr>
+                <td class="bordered" colspan="6">Custom Star Data (Equinox J2000.0 Epoch J2000.0)</td>
+            </tr>
+            <tr>
+                <td class="bordered">Star Name</td>
+                <td class="bordered">RA (D.d)</td>
+                <td class="bordered">Dec (+/-D.d)</td>
+                <td class="bordered">pm RA (mas/yr)</td>
+                <td class="bordered">pm Dec (mas/yr)</td>
+                <td class="bordered">Magnitude</td>
+            </tr>
+
+            <tr id="CustomStarTableRow1" class="hidden">
+                <td class="uib">
+                    <input id="uiCustomStar1Name" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar1RA&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar1RA" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar1Dec&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar1Dec" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar1_pmRA&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar1_pmRA" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar1_pmDec&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar1_pmDec" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar1Mag&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar1Mag" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar1Name&#39;)" autocomplete="off">
+                </td>
+            </tr>
+
+            <tr id="CustomStarTableRow2" class="hidden">
+                <td class="uib">
+                    <input id="uiCustomStar2Name" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar2RA&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar2RA" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar2Dec&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar2Dec" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar2_pmRA&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar2_pmRA" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar2_pmDec&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar2_pmDec" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar2Mag&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiCustomStar2Mag" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiCustomStar2Name&#39;)" autocomplete="off">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" class="bordered textLeft padded">
+                    NOTES on using this CUSTOM STARS utility. See User Notes / Settings / "Include Custom Stars" for more detail.<br>
+                    • Astron holds data for two CUSTOM STARS.<br>
+                    • On changing this option to "ONE" or "TWO", the CUSTOM STAR(S) become visible and the upper star (ONE)
+                    or lower star (TWO) becomes the currently selected body. Other bodies can be selected as normal.<br>
+                    • On all other pages, the CUSTOM STAR names are preceeded by a "★" distinguishing mark.<br>
+                    • The CUSTOM STARS are shown as the last two bodies in the body select list and elsewhere.
+                         [Keystroke hint: Press "z" then "⯆"]<br>
+                    • When option set to "ONE" or "TWO", the CUSTOM STAR(S) are included in all Astron utilities.<br>
+                    • When option set to "NONE", the stars are excluded and this table hidden.<br>
+                    • When Astron is closed, CUSTOM STARS data are remembered for next use.<br>
+                    • On first use, the CUSTOM STARS are set to Castor (α Geminorum) and Mirach (β Andromedae).<br>
+                    • When entering values, RA and Dec must be in degrees and decimal degrees.<br>
+                    • pm RA values are in milliarcseconds of ARC, not mas of Right Ascension.<br>
+                    • Input data must be referenced to J2000.0 Equinox and Epoch. Astron then adjusts to the selected date and time.<br>
+                    • See User Notes / Settings / "Include Custom Stars" for suggested link to catalogue star data.
+                </td>
+            </tr>
+        </tbody></table>
+    </div> <!-- End of Settings -->
+
+
+
+
+
+
+
+
+    <div class="FalsePage"></div>
+
+
+
+
+
+
+
+
+
+    <!-- STAR INFO PAGE-->
+    <div id="divStarInfo"> <!-- Home Page Tab seeks this div id -->
+
+        <!-- Header -->
+        <div class="inLine"><h1>ASTRON STAR INFORMATION PAGE</h1></div>
+        <div class="inLine">
+            <input id="btnStarInfoJumpHomePage1" class="btnJumpHomePage padLR" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+
+        <br> <!-- break between upper and lower inline blocks -->
+
+        <!-- BLOCK 1 ******** COMMON NAME ORDER *********************-->
+        <div class="inLine">
+            <table id="tblStarInfo1"><tbody><tr><td id="Star1Header" colspan="5" class="Header2" style="text-align: center;">COMMON NAME ORDER</td></tr><tr><td id="Star1Header_col0" class="uih">Body</td><td id="Star1Header_col1" class="uih">Bayer Name</td><td id="Star1Header_col2" class="uih">SHA(°)</td><td id="Star1Header_col3" class="uih">Dec(°)</td><td id="Star1Header_col4" class="uih">Mag</td></tr><tr><td id="Star1Row7col0" class="bordered textLeft padLR">Acamar</td><td id="Star1Row7col1" class="bordered textLeft padLR">θ Eridani</td><td id="Star1Row7col2" class="bordered textRight padLR">315</td><td id="Star1Row7col3" class="bordered textRight padLR">-40</td><td id="Star1Row7col4" class="bordered textRight padLR">2.9</td></tr><tr><td id="Star1Row8col0" class="bordered textLeft padLR">ACHERNAR</td><td id="Star1Row8col1" class="bordered textLeft padLR">α Eridani</td><td id="Star1Row8col2" class="bordered textRight padLR">335</td><td id="Star1Row8col3" class="bordered textRight padLR">-57</td><td id="Star1Row8col4" class="bordered textRight padLR">0.4</td></tr><tr><td id="Star1Row9col0" class="bordered textLeft padLR">ACRUX</td><td id="Star1Row9col1" class="bordered textLeft padLR">α Crucis</td><td id="Star1Row9col2" class="bordered textRight padLR">173</td><td id="Star1Row9col3" class="bordered textRight padLR">-63</td><td id="Star1Row9col4" class="bordered textRight padLR">0.7</td></tr><tr><td id="Star1Row10col0" class="bordered textLeft padLR">ADHARA</td><td id="Star1Row10col1" class="bordered textLeft padLR">ε Canis Majoris</td><td id="Star1Row10col2" class="bordered textRight padLR">255</td><td id="Star1Row10col3" class="bordered textRight padLR">-29</td><td id="Star1Row10col4" class="bordered textRight padLR">1.5</td></tr><tr><td id="Star1Row11col0" class="bordered textLeft padLR">ALDEBARAN</td><td id="Star1Row11col1" class="bordered textLeft padLR">α Tauri</td><td id="Star1Row11col2" class="bordered textRight padLR">291</td><td id="Star1Row11col3" class="bordered textRight padLR">17</td><td id="Star1Row11col4" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star1Row12col0" class="bordered textLeft padLR">Alioth</td><td id="Star1Row12col1" class="bordered textLeft padLR">ε Ursae Majoris</td><td id="Star1Row12col2" class="bordered textRight padLR">166</td><td id="Star1Row12col3" class="bordered textRight padLR">56</td><td id="Star1Row12col4" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star1Row13col0" class="bordered textLeft padLR">Alkaid</td><td id="Star1Row13col1" class="bordered textLeft padLR">η Ursae Majoris</td><td id="Star1Row13col2" class="bordered textRight padLR">153</td><td id="Star1Row13col3" class="bordered textRight padLR">49</td><td id="Star1Row13col4" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star1Row14col0" class="bordered textLeft padLR">Alnair</td><td id="Star1Row14col1" class="bordered textLeft padLR">α Gruis</td><td id="Star1Row14col2" class="bordered textRight padLR">28</td><td id="Star1Row14col3" class="bordered textRight padLR">-47</td><td id="Star1Row14col4" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star1Row15col0" class="bordered textLeft padLR">Alnilam</td><td id="Star1Row15col1" class="bordered textLeft padLR">ε Orionis</td><td id="Star1Row15col2" class="bordered textRight padLR">276</td><td id="Star1Row15col3" class="bordered textRight padLR">-01</td><td id="Star1Row15col4" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star1Row16col0" class="bordered textLeft padLR">Alphard</td><td id="Star1Row16col1" class="bordered textLeft padLR">α Hydrae</td><td id="Star1Row16col2" class="bordered textRight padLR">218</td><td id="Star1Row16col3" class="bordered textRight padLR">-09</td><td id="Star1Row16col4" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star1Row17col0" class="bordered textLeft padLR">Alphecca</td><td id="Star1Row17col1" class="bordered textLeft padLR">α Coronae Borealis</td><td id="Star1Row17col2" class="bordered textRight padLR">126</td><td id="Star1Row17col3" class="bordered textRight padLR">27</td><td id="Star1Row17col4" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star1Row18col0" class="bordered textLeft padLR">Alpheratz</td><td id="Star1Row18col1" class="bordered textLeft padLR">α Andromedae</td><td id="Star1Row18col2" class="bordered textRight padLR">358</td><td id="Star1Row18col3" class="bordered textRight padLR">29</td><td id="Star1Row18col4" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star1Row19col0" class="bordered textLeft padLR">ALTAIR</td><td id="Star1Row19col1" class="bordered textLeft padLR">α Aquilae</td><td id="Star1Row19col2" class="bordered textRight padLR">62</td><td id="Star1Row19col3" class="bordered textRight padLR">09</td><td id="Star1Row19col4" class="bordered textRight padLR">0.8</td></tr><tr><td id="Star1Row20col0" class="bordered textLeft padLR">Ankaa</td><td id="Star1Row20col1" class="bordered textLeft padLR">α Phoenicis</td><td id="Star1Row20col2" class="bordered textRight padLR">353</td><td id="Star1Row20col3" class="bordered textRight padLR">-42</td><td id="Star1Row20col4" class="bordered textRight padLR">2.6</td></tr><tr><td id="Star1Row21col0" class="bordered textLeft padLR">ANTARES</td><td id="Star1Row21col1" class="bordered textLeft padLR">α Scorpii</td><td id="Star1Row21col2" class="bordered textRight padLR">112</td><td id="Star1Row21col3" class="bordered textRight padLR">-26</td><td id="Star1Row21col4" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star1Row22col0" class="bordered textLeft padLR">ARCTURUS</td><td id="Star1Row22col1" class="bordered textLeft padLR">α Boötis</td><td id="Star1Row22col2" class="bordered textRight padLR">146</td><td id="Star1Row22col3" class="bordered textRight padLR">19</td><td id="Star1Row22col4" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star1Row23col0" class="bordered textLeft padLR">Atria</td><td id="Star1Row23col1" class="bordered textLeft padLR">α Trianguli Australis</td><td id="Star1Row23col2" class="bordered textRight padLR">107</td><td id="Star1Row23col3" class="bordered textRight padLR">-69</td><td id="Star1Row23col4" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star1Row24col0" class="bordered textLeft padLR">Avior</td><td id="Star1Row24col1" class="bordered textLeft padLR">ε Carinae</td><td id="Star1Row24col2" class="bordered textRight padLR">234</td><td id="Star1Row24col3" class="bordered textRight padLR">-60</td><td id="Star1Row24col4" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star1Row25col0" class="bordered textLeft padLR">Bellatrix</td><td id="Star1Row25col1" class="bordered textLeft padLR">γ Orionis</td><td id="Star1Row25col2" class="bordered textRight padLR">278</td><td id="Star1Row25col3" class="bordered textRight padLR">06</td><td id="Star1Row25col4" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star1Row26col0" class="bordered textLeft padLR">BETELGEUSE</td><td id="Star1Row26col1" class="bordered textLeft padLR">α Orionis</td><td id="Star1Row26col2" class="bordered textRight padLR">271</td><td id="Star1Row26col3" class="bordered textRight padLR">07</td><td id="Star1Row26col4" class="bordered textRight padLR">1.5</td></tr><tr><td id="Star1Row27col0" class="bordered textLeft padLR">CANOPUS</td><td id="Star1Row27col1" class="bordered textLeft padLR">α Carinae</td><td id="Star1Row27col2" class="bordered textRight padLR">264</td><td id="Star1Row27col3" class="bordered textRight padLR">-53</td><td id="Star1Row27col4" class="bordered textRight padLR">-0.7</td></tr><tr><td id="Star1Row28col0" class="bordered textLeft padLR">CAPELLA</td><td id="Star1Row28col1" class="bordered textLeft padLR">α Aurigae</td><td id="Star1Row28col2" class="bordered textRight padLR">280</td><td id="Star1Row28col3" class="bordered textRight padLR">46</td><td id="Star1Row28col4" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star1Row29col0" class="bordered textLeft padLR">DENEB</td><td id="Star1Row29col1" class="bordered textLeft padLR">α Cygni</td><td id="Star1Row29col2" class="bordered textRight padLR">49</td><td id="Star1Row29col3" class="bordered textRight padLR">45</td><td id="Star1Row29col4" class="bordered textRight padLR">1.2</td></tr><tr><td id="Star1Row30col0" class="bordered textLeft padLR">Denebola</td><td id="Star1Row30col1" class="bordered textLeft padLR">β Leonis</td><td id="Star1Row30col2" class="bordered textRight padLR">182</td><td id="Star1Row30col3" class="bordered textRight padLR">14</td><td id="Star1Row30col4" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star1Row31col0" class="bordered textLeft padLR">Diphda</td><td id="Star1Row31col1" class="bordered textLeft padLR">β Ceti</td><td id="Star1Row31col2" class="bordered textRight padLR">349</td><td id="Star1Row31col3" class="bordered textRight padLR">-18</td><td id="Star1Row31col4" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star1Row32col0" class="bordered textLeft padLR">Dubhe</td><td id="Star1Row32col1" class="bordered textLeft padLR">α Ursae Majoris</td><td id="Star1Row32col2" class="bordered textRight padLR">194</td><td id="Star1Row32col3" class="bordered textRight padLR">62</td><td id="Star1Row32col4" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star1Row33col0" class="bordered textLeft padLR">Elnath</td><td id="Star1Row33col1" class="bordered textLeft padLR">β Tauri</td><td id="Star1Row33col2" class="bordered textRight padLR">278</td><td id="Star1Row33col3" class="bordered textRight padLR">29</td><td id="Star1Row33col4" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star1Row34col0" class="bordered textLeft padLR">Eltanin</td><td id="Star1Row34col1" class="bordered textLeft padLR">γ Draconis</td><td id="Star1Row34col2" class="bordered textRight padLR">91</td><td id="Star1Row34col3" class="bordered textRight padLR">51</td><td id="Star1Row34col4" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star1Row35col0" class="bordered textLeft padLR">Enif</td><td id="Star1Row35col1" class="bordered textLeft padLR">ε Pegasi</td><td id="Star1Row35col2" class="bordered textRight padLR">34</td><td id="Star1Row35col3" class="bordered textRight padLR">10</td><td id="Star1Row35col4" class="bordered textRight padLR">2.4</td></tr><tr><td id="Star1Row36col0" class="bordered textLeft padLR">FOMALHAUT</td><td id="Star1Row36col1" class="bordered textLeft padLR">α Piscis Austrini</td><td id="Star1Row36col2" class="bordered textRight padLR">15</td><td id="Star1Row36col3" class="bordered textRight padLR">-30</td><td id="Star1Row36col4" class="bordered textRight padLR">1.2</td></tr><tr><td id="Star1Row37col0" class="bordered textLeft padLR">Gacrux</td><td id="Star1Row37col1" class="bordered textLeft padLR">γ Crucis</td><td id="Star1Row37col2" class="bordered textRight padLR">172</td><td id="Star1Row37col3" class="bordered textRight padLR">-57</td><td id="Star1Row37col4" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star1Row38col0" class="bordered textLeft padLR">Gienah</td><td id="Star1Row38col1" class="bordered textLeft padLR">y Corvi</td><td id="Star1Row38col2" class="bordered textRight padLR">176</td><td id="Star1Row38col3" class="bordered textRight padLR">-18</td><td id="Star1Row38col4" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star1Row39col0" class="bordered textLeft padLR">HADAR</td><td id="Star1Row39col1" class="bordered textLeft padLR">β Centauri</td><td id="Star1Row39col2" class="bordered textRight padLR">149</td><td id="Star1Row39col3" class="bordered textRight padLR">-60</td><td id="Star1Row39col4" class="bordered textRight padLR">0.6</td></tr><tr><td id="Star1Row40col0" class="bordered textLeft padLR">Hamal</td><td id="Star1Row40col1" class="bordered textLeft padLR">α Arietis</td><td id="Star1Row40col2" class="bordered textRight padLR">328</td><td id="Star1Row40col3" class="bordered textRight padLR">24</td><td id="Star1Row40col4" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star1Row41col0" class="bordered textLeft padLR">Kaus_Aust</td><td id="Star1Row41col1" class="bordered textLeft padLR">ε Sagittarii</td><td id="Star1Row41col2" class="bordered textRight padLR">84</td><td id="Star1Row41col3" class="bordered textRight padLR">-34</td><td id="Star1Row41col4" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star1Row42col0" class="bordered textLeft padLR">Kochab</td><td id="Star1Row42col1" class="bordered textLeft padLR">β Ursae Minoris</td><td id="Star1Row42col2" class="bordered textRight padLR">137</td><td id="Star1Row42col3" class="bordered textRight padLR">74</td><td id="Star1Row42col4" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star1Row43col0" class="bordered textLeft padLR">Markab</td><td id="Star1Row43col1" class="bordered textLeft padLR">α Pegasi</td><td id="Star1Row43col2" class="bordered textRight padLR">14</td><td id="Star1Row43col3" class="bordered textRight padLR">15</td><td id="Star1Row43col4" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star1Row44col0" class="bordered textLeft padLR">Menkar</td><td id="Star1Row44col1" class="bordered textLeft padLR">α Ceti</td><td id="Star1Row44col2" class="bordered textRight padLR">314</td><td id="Star1Row44col3" class="bordered textRight padLR">04</td><td id="Star1Row44col4" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star1Row45col0" class="bordered textLeft padLR">Menkent</td><td id="Star1Row45col1" class="bordered textLeft padLR">θ Centauri</td><td id="Star1Row45col2" class="bordered textRight padLR">148</td><td id="Star1Row45col3" class="bordered textRight padLR">-36</td><td id="Star1Row45col4" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star1Row46col0" class="bordered textLeft padLR">Miaplacidus</td><td id="Star1Row46col1" class="bordered textLeft padLR">β Carinae</td><td id="Star1Row46col2" class="bordered textRight padLR">222</td><td id="Star1Row46col3" class="bordered textRight padLR">-70</td><td id="Star1Row46col4" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star1Row47col0" class="bordered textLeft padLR">Mirfak</td><td id="Star1Row47col1" class="bordered textLeft padLR">α Persei</td><td id="Star1Row47col2" class="bordered textRight padLR">309</td><td id="Star1Row47col3" class="bordered textRight padLR">50</td><td id="Star1Row47col4" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star1Row48col0" class="bordered textLeft padLR">Nunki</td><td id="Star1Row48col1" class="bordered textLeft padLR">σ Sagittarii</td><td id="Star1Row48col2" class="bordered textRight padLR">76</td><td id="Star1Row48col3" class="bordered textRight padLR">-26</td><td id="Star1Row48col4" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star1Row49col0" class="bordered textLeft padLR">Peacock</td><td id="Star1Row49col1" class="bordered textLeft padLR">α Pavonis</td><td id="Star1Row49col2" class="bordered textRight padLR">53</td><td id="Star1Row49col3" class="bordered textRight padLR">-57</td><td id="Star1Row49col4" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star1Row50col0" class="bordered textLeft padLR">Polaris</td><td id="Star1Row50col1" class="bordered textLeft padLR">α Ursae Minoris</td><td id="Star1Row50col2" class="bordered textRight padLR">315</td><td id="Star1Row50col3" class="bordered textRight padLR">89</td><td id="Star1Row50col4" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star1Row51col0" class="bordered textLeft padLR">POLLUX</td><td id="Star1Row51col1" class="bordered textLeft padLR">β Geminorum</td><td id="Star1Row51col2" class="bordered textRight padLR">243</td><td id="Star1Row51col3" class="bordered textRight padLR">28</td><td id="Star1Row51col4" class="bordered textRight padLR">1.1</td></tr><tr><td id="Star1Row52col0" class="bordered textLeft padLR">PROCYON</td><td id="Star1Row52col1" class="bordered textLeft padLR">α Canis Minoris</td><td id="Star1Row52col2" class="bordered textRight padLR">245</td><td id="Star1Row52col3" class="bordered textRight padLR">05</td><td id="Star1Row52col4" class="bordered textRight padLR">0.4</td></tr><tr><td id="Star1Row53col0" class="bordered textLeft padLR">Rasalhague</td><td id="Star1Row53col1" class="bordered textLeft padLR">α Ophiuchi</td><td id="Star1Row53col2" class="bordered textRight padLR">96</td><td id="Star1Row53col3" class="bordered textRight padLR">13</td><td id="Star1Row53col4" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star1Row54col0" class="bordered textLeft padLR">REGULUS</td><td id="Star1Row54col1" class="bordered textLeft padLR">α Leonis</td><td id="Star1Row54col2" class="bordered textRight padLR">208</td><td id="Star1Row54col3" class="bordered textRight padLR">12</td><td id="Star1Row54col4" class="bordered textRight padLR">1.4</td></tr><tr><td id="Star1Row55col0" class="bordered textLeft padLR">RIGEL</td><td id="Star1Row55col1" class="bordered textLeft padLR">β Orionis</td><td id="Star1Row55col2" class="bordered textRight padLR">281</td><td id="Star1Row55col3" class="bordered textRight padLR">-08</td><td id="Star1Row55col4" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star1Row56col0" class="bordered textLeft padLR">RIGIL_KENT</td><td id="Star1Row56col1" class="bordered textLeft padLR">α Centauri</td><td id="Star1Row56col2" class="bordered textRight padLR">140</td><td id="Star1Row56col3" class="bordered textRight padLR">-61</td><td id="Star1Row56col4" class="bordered textRight padLR">-0.3</td></tr><tr><td id="Star1Row57col0" class="bordered textLeft padLR">Sabik</td><td id="Star1Row57col1" class="bordered textLeft padLR">η Ophiuchi</td><td id="Star1Row57col2" class="bordered textRight padLR">102</td><td id="Star1Row57col3" class="bordered textRight padLR">-16</td><td id="Star1Row57col4" class="bordered textRight padLR">2.4</td></tr><tr><td id="Star1Row58col0" class="bordered textLeft padLR">Schedar</td><td id="Star1Row58col1" class="bordered textLeft padLR">α Cassiopeiae</td><td id="Star1Row58col2" class="bordered textRight padLR">350</td><td id="Star1Row58col3" class="bordered textRight padLR">57</td><td id="Star1Row58col4" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star1Row59col0" class="bordered textLeft padLR">Shaula</td><td id="Star1Row59col1" class="bordered textLeft padLR">λ Scorpii</td><td id="Star1Row59col2" class="bordered textRight padLR">96</td><td id="Star1Row59col3" class="bordered textRight padLR">-37</td><td id="Star1Row59col4" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star1Row60col0" class="bordered textLeft padLR">SIRIUS</td><td id="Star1Row60col1" class="bordered textLeft padLR">α Canis Majoris</td><td id="Star1Row60col2" class="bordered textRight padLR">258</td><td id="Star1Row60col3" class="bordered textRight padLR">-17</td><td id="Star1Row60col4" class="bordered textRight padLR">-1.5</td></tr><tr><td id="Star1Row61col0" class="bordered textLeft padLR">SPICA</td><td id="Star1Row61col1" class="bordered textLeft padLR">α Virginis</td><td id="Star1Row61col2" class="bordered textRight padLR">158</td><td id="Star1Row61col3" class="bordered textRight padLR">-11</td><td id="Star1Row61col4" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star1Row62col0" class="bordered textLeft padLR">Suhail</td><td id="Star1Row62col1" class="bordered textLeft padLR">λ Velorum</td><td id="Star1Row62col2" class="bordered textRight padLR">223</td><td id="Star1Row62col3" class="bordered textRight padLR">-44</td><td id="Star1Row62col4" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star1Row63col0" class="bordered textLeft padLR">VEGA</td><td id="Star1Row63col1" class="bordered textLeft padLR">α Lyrae</td><td id="Star1Row63col2" class="bordered textRight padLR">81</td><td id="Star1Row63col3" class="bordered textRight padLR">39</td><td id="Star1Row63col4" class="bordered textRight padLR">0.0</td></tr><tr><td id="Star1Row64col0" class="bordered textLeft padLR">Zuben_ubi</td><td id="Star1Row64col1" class="bordered textLeft padLR">α02 Librae</td><td id="Star1Row64col2" class="bordered textRight padLR">137</td><td id="Star1Row64col3" class="bordered textRight padLR">-16</td><td id="Star1Row64col4" class="bordered textRight padLR">2.6</td></tr></tbody></table>
+        </div>
+
+        <!-- BLOCK 2 ******** MAGNITUDE ORDER *********************-->
+        <div class="inLine">
+            <table id="tblStarInfo2"><tbody><tr><td id="Star2Header" class="Header2" colspan="2" style="text-align: center;">MAGNITUDE ORDER</td></tr><tr><td id="Star2Header_col0" class="uih">Body</td><td id="Star2Header_col1" class="uih">Mag</td></tr><tr><td id="Star2Row7col0" class="bordered textLeft padLR">SIRIUS</td><td id="Star2Row7col1" class="bordered textLeft padLR">-1.5</td></tr><tr><td id="Star2Row8col0" class="bordered textLeft padLR">CANOPUS</td><td id="Star2Row8col1" class="bordered textLeft padLR">-0.7</td></tr><tr><td id="Star2Row9col0" class="bordered textLeft padLR">RIGIL_KENT</td><td id="Star2Row9col1" class="bordered textLeft padLR">-0.3</td></tr><tr><td id="Star2Row10col0" class="bordered textLeft padLR">VEGA</td><td id="Star2Row10col1" class="bordered textLeft padLR">0.0</td></tr><tr><td id="Star2Row11col0" class="bordered textLeft padLR">ARCTURUS</td><td id="Star2Row11col1" class="bordered textLeft padLR">0.1</td></tr><tr><td id="Star2Row12col0" class="bordered textLeft padLR">CAPELLA</td><td id="Star2Row12col1" class="bordered textLeft padLR">0.1</td></tr><tr><td id="Star2Row13col0" class="bordered textLeft padLR">RIGEL</td><td id="Star2Row13col1" class="bordered textLeft padLR">0.1</td></tr><tr><td id="Star2Row14col0" class="bordered textLeft padLR">ACHERNAR</td><td id="Star2Row14col1" class="bordered textLeft padLR">0.4</td></tr><tr><td id="Star2Row15col0" class="bordered textLeft padLR">PROCYON</td><td id="Star2Row15col1" class="bordered textLeft padLR">0.4</td></tr><tr><td id="Star2Row16col0" class="bordered textLeft padLR">HADAR</td><td id="Star2Row16col1" class="bordered textLeft padLR">0.6</td></tr><tr><td id="Star2Row17col0" class="bordered textLeft padLR">ACRUX</td><td id="Star2Row17col1" class="bordered textLeft padLR">0.7</td></tr><tr><td id="Star2Row18col0" class="bordered textLeft padLR">ALTAIR</td><td id="Star2Row18col1" class="bordered textLeft padLR">0.8</td></tr><tr><td id="Star2Row19col0" class="bordered textLeft padLR">ALDEBARAN</td><td id="Star2Row19col1" class="bordered textLeft padLR">1.0</td></tr><tr><td id="Star2Row20col0" class="bordered textLeft padLR">ANTARES</td><td id="Star2Row20col1" class="bordered textLeft padLR">1.0</td></tr><tr><td id="Star2Row21col0" class="bordered textLeft padLR">SPICA</td><td id="Star2Row21col1" class="bordered textLeft padLR">1.0</td></tr><tr><td id="Star2Row22col0" class="bordered textLeft padLR">POLLUX</td><td id="Star2Row22col1" class="bordered textLeft padLR">1.1</td></tr><tr><td id="Star2Row23col0" class="bordered textLeft padLR">DENEB</td><td id="Star2Row23col1" class="bordered textLeft padLR">1.2</td></tr><tr><td id="Star2Row24col0" class="bordered textLeft padLR">FOMALHAUT</td><td id="Star2Row24col1" class="bordered textLeft padLR">1.2</td></tr><tr><td id="Star2Row25col0" class="bordered textLeft padLR">REGULUS</td><td id="Star2Row25col1" class="bordered textLeft padLR">1.4</td></tr><tr><td id="Star2Row26col0" class="bordered textLeft padLR">ADHARA</td><td id="Star2Row26col1" class="bordered textLeft padLR">1.5</td></tr><tr><td id="Star2Row27col0" class="bordered textLeft padLR">BETELGEUSE</td><td id="Star2Row27col1" class="bordered textLeft padLR">1.5</td></tr><tr><td id="Star2Row28col0" class="bordered textLeft padLR">Alnilam</td><td id="Star2Row28col1" class="bordered textLeft padLR">1.6</td></tr><tr><td id="Star2Row29col0" class="bordered textLeft padLR">Bellatrix</td><td id="Star2Row29col1" class="bordered textLeft padLR">1.6</td></tr><tr><td id="Star2Row30col0" class="bordered textLeft padLR">Gacrux</td><td id="Star2Row30col1" class="bordered textLeft padLR">1.6</td></tr><tr><td id="Star2Row31col0" class="bordered textLeft padLR">Shaula</td><td id="Star2Row31col1" class="bordered textLeft padLR">1.6</td></tr><tr><td id="Star2Row32col0" class="bordered textLeft padLR">Alnair</td><td id="Star2Row32col1" class="bordered textLeft padLR">1.7</td></tr><tr><td id="Star2Row33col0" class="bordered textLeft padLR">Elnath</td><td id="Star2Row33col1" class="bordered textLeft padLR">1.7</td></tr><tr><td id="Star2Row34col0" class="bordered textLeft padLR">Miaplacidus</td><td id="Star2Row34col1" class="bordered textLeft padLR">1.7</td></tr><tr><td id="Star2Row35col0" class="bordered textLeft padLR">Alioth</td><td id="Star2Row35col1" class="bordered textLeft padLR">1.8</td></tr><tr><td id="Star2Row36col0" class="bordered textLeft padLR">Alkaid</td><td id="Star2Row36col1" class="bordered textLeft padLR">1.8</td></tr><tr><td id="Star2Row37col0" class="bordered textLeft padLR">Dubhe</td><td id="Star2Row37col1" class="bordered textLeft padLR">1.8</td></tr><tr><td id="Star2Row38col0" class="bordered textLeft padLR">Kaus_Aust</td><td id="Star2Row38col1" class="bordered textLeft padLR">1.8</td></tr><tr><td id="Star2Row39col0" class="bordered textLeft padLR">Mirfak</td><td id="Star2Row39col1" class="bordered textLeft padLR">1.8</td></tr><tr><td id="Star2Row40col0" class="bordered textLeft padLR">Atria</td><td id="Star2Row40col1" class="bordered textLeft padLR">1.9</td></tr><tr><td id="Star2Row41col0" class="bordered textLeft padLR">Avior</td><td id="Star2Row41col1" class="bordered textLeft padLR">1.9</td></tr><tr><td id="Star2Row42col0" class="bordered textLeft padLR">Peacock</td><td id="Star2Row42col1" class="bordered textLeft padLR">1.9</td></tr><tr><td id="Star2Row43col0" class="bordered textLeft padLR">Alpheratz</td><td id="Star2Row43col1" class="bordered textLeft padLR">2.0</td></tr><tr><td id="Star2Row44col0" class="bordered textLeft padLR">Diphda</td><td id="Star2Row44col1" class="bordered textLeft padLR">2.0</td></tr><tr><td id="Star2Row45col0" class="bordered textLeft padLR">Hamal</td><td id="Star2Row45col1" class="bordered textLeft padLR">2.0</td></tr><tr><td id="Star2Row46col0" class="bordered textLeft padLR">Polaris</td><td id="Star2Row46col1" class="bordered textLeft padLR">2.0</td></tr><tr><td id="Star2Row47col0" class="bordered textLeft padLR">Alphard</td><td id="Star2Row47col1" class="bordered textLeft padLR">2.1</td></tr><tr><td id="Star2Row48col0" class="bordered textLeft padLR">Denebola</td><td id="Star2Row48col1" class="bordered textLeft padLR">2.1</td></tr><tr><td id="Star2Row49col0" class="bordered textLeft padLR">Kochab</td><td id="Star2Row49col1" class="bordered textLeft padLR">2.1</td></tr><tr><td id="Star2Row50col0" class="bordered textLeft padLR">Menkent</td><td id="Star2Row50col1" class="bordered textLeft padLR">2.1</td></tr><tr><td id="Star2Row51col0" class="bordered textLeft padLR">Nunki</td><td id="Star2Row51col1" class="bordered textLeft padLR">2.1</td></tr><tr><td id="Star2Row52col0" class="bordered textLeft padLR">Rasalhague</td><td id="Star2Row52col1" class="bordered textLeft padLR">2.1</td></tr><tr><td id="Star2Row53col0" class="bordered textLeft padLR">Alphecca</td><td id="Star2Row53col1" class="bordered textLeft padLR">2.2</td></tr><tr><td id="Star2Row54col0" class="bordered textLeft padLR">Eltanin</td><td id="Star2Row54col1" class="bordered textLeft padLR">2.2</td></tr><tr><td id="Star2Row55col0" class="bordered textLeft padLR">Schedar</td><td id="Star2Row55col1" class="bordered textLeft padLR">2.2</td></tr><tr><td id="Star2Row56col0" class="bordered textLeft padLR">Suhail</td><td id="Star2Row56col1" class="bordered textLeft padLR">2.2</td></tr><tr><td id="Star2Row57col0" class="bordered textLeft padLR">Enif</td><td id="Star2Row57col1" class="bordered textLeft padLR">2.4</td></tr><tr><td id="Star2Row58col0" class="bordered textLeft padLR">Sabik</td><td id="Star2Row58col1" class="bordered textLeft padLR">2.4</td></tr><tr><td id="Star2Row59col0" class="bordered textLeft padLR">Gienah</td><td id="Star2Row59col1" class="bordered textLeft padLR">2.5</td></tr><tr><td id="Star2Row60col0" class="bordered textLeft padLR">Markab</td><td id="Star2Row60col1" class="bordered textLeft padLR">2.5</td></tr><tr><td id="Star2Row61col0" class="bordered textLeft padLR">Menkar</td><td id="Star2Row61col1" class="bordered textLeft padLR">2.5</td></tr><tr><td id="Star2Row62col0" class="bordered textLeft padLR">Ankaa</td><td id="Star2Row62col1" class="bordered textLeft padLR">2.6</td></tr><tr><td id="Star2Row63col0" class="bordered textLeft padLR">Zuben_ubi</td><td id="Star2Row63col1" class="bordered textLeft padLR">2.6</td></tr><tr><td id="Star2Row64col0" class="bordered textLeft padLR">Acamar</td><td id="Star2Row64col1" class="bordered textLeft padLR">2.9</td></tr></tbody></table>
+        </div>
+
+        <!-- BLOCK 3 ******** SHA ORDER *********************-->
+        <div class="inLine">
+            <table id="tblStarInfo3"><tbody><tr><td id="Star3Header" class="Header2" colspan="4" style="text-align: center;">SHA ORDER</td></tr><tr><td id="Star3Header_col0" class="uih">Body</td><td id="Star3Header_col1" class="uih">SHA(°)</td><td id="Star3Header_col2" class="uih">Dec(°)</td><td id="Star3Header_col3" class="uih">Mag</td></tr><tr><td id="Star3Row7col0" class="bordered textLeft padLR">Markab</td><td id="Star3Row7col1" class="bordered textLeft padLR">014</td><td id="Star3Row7col2" class="bordered textRight padLR">15</td><td id="Star3Row7col3" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star3Row8col0" class="bordered textLeft padLR">FOMALHAUT</td><td id="Star3Row8col1" class="bordered textLeft padLR">015</td><td id="Star3Row8col2" class="bordered textRight padLR">-30</td><td id="Star3Row8col3" class="bordered textRight padLR">1.2</td></tr><tr><td id="Star3Row9col0" class="bordered textLeft padLR">Alnair</td><td id="Star3Row9col1" class="bordered textLeft padLR">028</td><td id="Star3Row9col2" class="bordered textRight padLR">-47</td><td id="Star3Row9col3" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star3Row10col0" class="bordered textLeft padLR">Enif</td><td id="Star3Row10col1" class="bordered textLeft padLR">034</td><td id="Star3Row10col2" class="bordered textRight padLR">10</td><td id="Star3Row10col3" class="bordered textRight padLR">2.4</td></tr><tr><td id="Star3Row11col0" class="bordered textLeft padLR">DENEB</td><td id="Star3Row11col1" class="bordered textLeft padLR">049</td><td id="Star3Row11col2" class="bordered textRight padLR">45</td><td id="Star3Row11col3" class="bordered textRight padLR">1.2</td></tr><tr><td id="Star3Row12col0" class="bordered textLeft padLR">Peacock</td><td id="Star3Row12col1" class="bordered textLeft padLR">053</td><td id="Star3Row12col2" class="bordered textRight padLR">-57</td><td id="Star3Row12col3" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star3Row13col0" class="bordered textLeft padLR">ALTAIR</td><td id="Star3Row13col1" class="bordered textLeft padLR">062</td><td id="Star3Row13col2" class="bordered textRight padLR">09</td><td id="Star3Row13col3" class="bordered textRight padLR">0.8</td></tr><tr><td id="Star3Row14col0" class="bordered textLeft padLR">Nunki</td><td id="Star3Row14col1" class="bordered textLeft padLR">076</td><td id="Star3Row14col2" class="bordered textRight padLR">-26</td><td id="Star3Row14col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star3Row15col0" class="bordered textLeft padLR">VEGA</td><td id="Star3Row15col1" class="bordered textLeft padLR">081</td><td id="Star3Row15col2" class="bordered textRight padLR">39</td><td id="Star3Row15col3" class="bordered textRight padLR">0.0</td></tr><tr><td id="Star3Row16col0" class="bordered textLeft padLR">Kaus_Aust</td><td id="Star3Row16col1" class="bordered textLeft padLR">084</td><td id="Star3Row16col2" class="bordered textRight padLR">-34</td><td id="Star3Row16col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star3Row17col0" class="bordered textLeft padLR">Eltanin</td><td id="Star3Row17col1" class="bordered textLeft padLR">091</td><td id="Star3Row17col2" class="bordered textRight padLR">51</td><td id="Star3Row17col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star3Row18col0" class="bordered textLeft padLR">Rasalhague</td><td id="Star3Row18col1" class="bordered textLeft padLR">096</td><td id="Star3Row18col2" class="bordered textRight padLR">13</td><td id="Star3Row18col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star3Row19col0" class="bordered textLeft padLR">Shaula</td><td id="Star3Row19col1" class="bordered textLeft padLR">096</td><td id="Star3Row19col2" class="bordered textRight padLR">-37</td><td id="Star3Row19col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star3Row20col0" class="bordered textLeft padLR">Sabik</td><td id="Star3Row20col1" class="bordered textLeft padLR">102</td><td id="Star3Row20col2" class="bordered textRight padLR">-16</td><td id="Star3Row20col3" class="bordered textRight padLR">2.4</td></tr><tr><td id="Star3Row21col0" class="bordered textLeft padLR">Atria</td><td id="Star3Row21col1" class="bordered textLeft padLR">107</td><td id="Star3Row21col2" class="bordered textRight padLR">-69</td><td id="Star3Row21col3" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star3Row22col0" class="bordered textLeft padLR">ANTARES</td><td id="Star3Row22col1" class="bordered textLeft padLR">112</td><td id="Star3Row22col2" class="bordered textRight padLR">-26</td><td id="Star3Row22col3" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star3Row23col0" class="bordered textLeft padLR">Alphecca</td><td id="Star3Row23col1" class="bordered textLeft padLR">126</td><td id="Star3Row23col2" class="bordered textRight padLR">27</td><td id="Star3Row23col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star3Row24col0" class="bordered textLeft padLR">Zuben_ubi</td><td id="Star3Row24col1" class="bordered textLeft padLR">137</td><td id="Star3Row24col2" class="bordered textRight padLR">-16</td><td id="Star3Row24col3" class="bordered textRight padLR">2.6</td></tr><tr><td id="Star3Row25col0" class="bordered textLeft padLR">Kochab</td><td id="Star3Row25col1" class="bordered textLeft padLR">137</td><td id="Star3Row25col2" class="bordered textRight padLR">74</td><td id="Star3Row25col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star3Row26col0" class="bordered textLeft padLR">RIGIL_KENT</td><td id="Star3Row26col1" class="bordered textLeft padLR">140</td><td id="Star3Row26col2" class="bordered textRight padLR">-61</td><td id="Star3Row26col3" class="bordered textRight padLR">-0.3</td></tr><tr><td id="Star3Row27col0" class="bordered textLeft padLR">ARCTURUS</td><td id="Star3Row27col1" class="bordered textLeft padLR">146</td><td id="Star3Row27col2" class="bordered textRight padLR">19</td><td id="Star3Row27col3" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star3Row28col0" class="bordered textLeft padLR">Menkent</td><td id="Star3Row28col1" class="bordered textLeft padLR">148</td><td id="Star3Row28col2" class="bordered textRight padLR">-36</td><td id="Star3Row28col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star3Row29col0" class="bordered textLeft padLR">HADAR</td><td id="Star3Row29col1" class="bordered textLeft padLR">149</td><td id="Star3Row29col2" class="bordered textRight padLR">-60</td><td id="Star3Row29col3" class="bordered textRight padLR">0.6</td></tr><tr><td id="Star3Row30col0" class="bordered textLeft padLR">Alkaid</td><td id="Star3Row30col1" class="bordered textLeft padLR">153</td><td id="Star3Row30col2" class="bordered textRight padLR">49</td><td id="Star3Row30col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star3Row31col0" class="bordered textLeft padLR">SPICA</td><td id="Star3Row31col1" class="bordered textLeft padLR">158</td><td id="Star3Row31col2" class="bordered textRight padLR">-11</td><td id="Star3Row31col3" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star3Row32col0" class="bordered textLeft padLR">Alioth</td><td id="Star3Row32col1" class="bordered textLeft padLR">166</td><td id="Star3Row32col2" class="bordered textRight padLR">56</td><td id="Star3Row32col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star3Row33col0" class="bordered textLeft padLR">Gacrux</td><td id="Star3Row33col1" class="bordered textLeft padLR">172</td><td id="Star3Row33col2" class="bordered textRight padLR">-57</td><td id="Star3Row33col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star3Row34col0" class="bordered textLeft padLR">ACRUX</td><td id="Star3Row34col1" class="bordered textLeft padLR">173</td><td id="Star3Row34col2" class="bordered textRight padLR">-63</td><td id="Star3Row34col3" class="bordered textRight padLR">0.7</td></tr><tr><td id="Star3Row35col0" class="bordered textLeft padLR">Gienah</td><td id="Star3Row35col1" class="bordered textLeft padLR">176</td><td id="Star3Row35col2" class="bordered textRight padLR">-18</td><td id="Star3Row35col3" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star3Row36col0" class="bordered textLeft padLR">Denebola</td><td id="Star3Row36col1" class="bordered textLeft padLR">182</td><td id="Star3Row36col2" class="bordered textRight padLR">14</td><td id="Star3Row36col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star3Row37col0" class="bordered textLeft padLR">Dubhe</td><td id="Star3Row37col1" class="bordered textLeft padLR">194</td><td id="Star3Row37col2" class="bordered textRight padLR">62</td><td id="Star3Row37col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star3Row38col0" class="bordered textLeft padLR">REGULUS</td><td id="Star3Row38col1" class="bordered textLeft padLR">208</td><td id="Star3Row38col2" class="bordered textRight padLR">12</td><td id="Star3Row38col3" class="bordered textRight padLR">1.4</td></tr><tr><td id="Star3Row39col0" class="bordered textLeft padLR">Alphard</td><td id="Star3Row39col1" class="bordered textLeft padLR">218</td><td id="Star3Row39col2" class="bordered textRight padLR">-09</td><td id="Star3Row39col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star3Row40col0" class="bordered textLeft padLR">Miaplacidus</td><td id="Star3Row40col1" class="bordered textLeft padLR">222</td><td id="Star3Row40col2" class="bordered textRight padLR">-70</td><td id="Star3Row40col3" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star3Row41col0" class="bordered textLeft padLR">Suhail</td><td id="Star3Row41col1" class="bordered textLeft padLR">223</td><td id="Star3Row41col2" class="bordered textRight padLR">-44</td><td id="Star3Row41col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star3Row42col0" class="bordered textLeft padLR">Avior</td><td id="Star3Row42col1" class="bordered textLeft padLR">234</td><td id="Star3Row42col2" class="bordered textRight padLR">-60</td><td id="Star3Row42col3" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star3Row43col0" class="bordered textLeft padLR">POLLUX</td><td id="Star3Row43col1" class="bordered textLeft padLR">243</td><td id="Star3Row43col2" class="bordered textRight padLR">28</td><td id="Star3Row43col3" class="bordered textRight padLR">1.1</td></tr><tr><td id="Star3Row44col0" class="bordered textLeft padLR">PROCYON</td><td id="Star3Row44col1" class="bordered textLeft padLR">245</td><td id="Star3Row44col2" class="bordered textRight padLR">05</td><td id="Star3Row44col3" class="bordered textRight padLR">0.4</td></tr><tr><td id="Star3Row45col0" class="bordered textLeft padLR">ADHARA</td><td id="Star3Row45col1" class="bordered textLeft padLR">255</td><td id="Star3Row45col2" class="bordered textRight padLR">-29</td><td id="Star3Row45col3" class="bordered textRight padLR">1.5</td></tr><tr><td id="Star3Row46col0" class="bordered textLeft padLR">SIRIUS</td><td id="Star3Row46col1" class="bordered textLeft padLR">258</td><td id="Star3Row46col2" class="bordered textRight padLR">-17</td><td id="Star3Row46col3" class="bordered textRight padLR">-1.5</td></tr><tr><td id="Star3Row47col0" class="bordered textLeft padLR">CANOPUS</td><td id="Star3Row47col1" class="bordered textLeft padLR">264</td><td id="Star3Row47col2" class="bordered textRight padLR">-53</td><td id="Star3Row47col3" class="bordered textRight padLR">-0.7</td></tr><tr><td id="Star3Row48col0" class="bordered textLeft padLR">BETELGEUSE</td><td id="Star3Row48col1" class="bordered textLeft padLR">271</td><td id="Star3Row48col2" class="bordered textRight padLR">07</td><td id="Star3Row48col3" class="bordered textRight padLR">1.5</td></tr><tr><td id="Star3Row49col0" class="bordered textLeft padLR">Alnilam</td><td id="Star3Row49col1" class="bordered textLeft padLR">276</td><td id="Star3Row49col2" class="bordered textRight padLR">-01</td><td id="Star3Row49col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star3Row50col0" class="bordered textLeft padLR">Elnath</td><td id="Star3Row50col1" class="bordered textLeft padLR">278</td><td id="Star3Row50col2" class="bordered textRight padLR">29</td><td id="Star3Row50col3" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star3Row51col0" class="bordered textLeft padLR">Bellatrix</td><td id="Star3Row51col1" class="bordered textLeft padLR">278</td><td id="Star3Row51col2" class="bordered textRight padLR">06</td><td id="Star3Row51col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star3Row52col0" class="bordered textLeft padLR">CAPELLA</td><td id="Star3Row52col1" class="bordered textLeft padLR">280</td><td id="Star3Row52col2" class="bordered textRight padLR">46</td><td id="Star3Row52col3" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star3Row53col0" class="bordered textLeft padLR">RIGEL</td><td id="Star3Row53col1" class="bordered textLeft padLR">281</td><td id="Star3Row53col2" class="bordered textRight padLR">-08</td><td id="Star3Row53col3" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star3Row54col0" class="bordered textLeft padLR">ALDEBARAN</td><td id="Star3Row54col1" class="bordered textLeft padLR">291</td><td id="Star3Row54col2" class="bordered textRight padLR">17</td><td id="Star3Row54col3" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star3Row55col0" class="bordered textLeft padLR">Mirfak</td><td id="Star3Row55col1" class="bordered textLeft padLR">309</td><td id="Star3Row55col2" class="bordered textRight padLR">50</td><td id="Star3Row55col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star3Row56col0" class="bordered textLeft padLR">Menkar</td><td id="Star3Row56col1" class="bordered textLeft padLR">314</td><td id="Star3Row56col2" class="bordered textRight padLR">04</td><td id="Star3Row56col3" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star3Row57col0" class="bordered textLeft padLR">Polaris</td><td id="Star3Row57col1" class="bordered textLeft padLR">315</td><td id="Star3Row57col2" class="bordered textRight padLR">89</td><td id="Star3Row57col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star3Row58col0" class="bordered textLeft padLR">Acamar</td><td id="Star3Row58col1" class="bordered textLeft padLR">315</td><td id="Star3Row58col2" class="bordered textRight padLR">-40</td><td id="Star3Row58col3" class="bordered textRight padLR">2.9</td></tr><tr><td id="Star3Row59col0" class="bordered textLeft padLR">Hamal</td><td id="Star3Row59col1" class="bordered textLeft padLR">328</td><td id="Star3Row59col2" class="bordered textRight padLR">24</td><td id="Star3Row59col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star3Row60col0" class="bordered textLeft padLR">ACHERNAR</td><td id="Star3Row60col1" class="bordered textLeft padLR">335</td><td id="Star3Row60col2" class="bordered textRight padLR">-57</td><td id="Star3Row60col3" class="bordered textRight padLR">0.4</td></tr><tr><td id="Star3Row61col0" class="bordered textLeft padLR">Diphda</td><td id="Star3Row61col1" class="bordered textLeft padLR">349</td><td id="Star3Row61col2" class="bordered textRight padLR">-18</td><td id="Star3Row61col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star3Row62col0" class="bordered textLeft padLR">Schedar</td><td id="Star3Row62col1" class="bordered textLeft padLR">350</td><td id="Star3Row62col2" class="bordered textRight padLR">57</td><td id="Star3Row62col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star3Row63col0" class="bordered textLeft padLR">Ankaa</td><td id="Star3Row63col1" class="bordered textLeft padLR">353</td><td id="Star3Row63col2" class="bordered textRight padLR">-42</td><td id="Star3Row63col3" class="bordered textRight padLR">2.6</td></tr><tr><td id="Star3Row64col0" class="bordered textLeft padLR">Alpheratz</td><td id="Star3Row64col1" class="bordered textLeft padLR">358</td><td id="Star3Row64col2" class="bordered textRight padLR">29</td><td id="Star3Row64col3" class="bordered textRight padLR">2.0</td></tr></tbody></table>
+        </div>
+
+        <!-- BLOCK 4 ******** DEC ORDER *********************-->
+        <div class="inLine">
+            <table id="tblStarInfo4"><tbody><tr><td id="Star4Header" class="Header2" colspan="4" style="text-align: center;">DECLINATION ORDER</td></tr><tr><td id="Star4Header_col0" class="uih">Body</td><td id="Star4Header_col1" class="uih">SHA(°)</td><td id="Star4Header_col2" class="uih">Dec(°)</td><td id="Star4Header_col3" class="uih">Mag</td></tr><tr><td id="Star4Row7col0" class="bordered textLeft padLR">Polaris</td><td id="Star4Row7col1" class="bordered textLeft padLR">315</td><td id="Star4Row7col2" class="bordered textRight padLR">89</td><td id="Star4Row7col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star4Row8col0" class="bordered textLeft padLR">Kochab</td><td id="Star4Row8col1" class="bordered textLeft padLR">137</td><td id="Star4Row8col2" class="bordered textRight padLR">74</td><td id="Star4Row8col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star4Row9col0" class="bordered textLeft padLR">Dubhe</td><td id="Star4Row9col1" class="bordered textLeft padLR">194</td><td id="Star4Row9col2" class="bordered textRight padLR">62</td><td id="Star4Row9col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star4Row10col0" class="bordered textLeft padLR">Schedar</td><td id="Star4Row10col1" class="bordered textLeft padLR">350</td><td id="Star4Row10col2" class="bordered textRight padLR">57</td><td id="Star4Row10col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star4Row11col0" class="bordered textLeft padLR">Alioth</td><td id="Star4Row11col1" class="bordered textLeft padLR">166</td><td id="Star4Row11col2" class="bordered textRight padLR">56</td><td id="Star4Row11col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star4Row12col0" class="bordered textLeft padLR">Eltanin</td><td id="Star4Row12col1" class="bordered textLeft padLR">091</td><td id="Star4Row12col2" class="bordered textRight padLR">51</td><td id="Star4Row12col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star4Row13col0" class="bordered textLeft padLR">Mirfak</td><td id="Star4Row13col1" class="bordered textLeft padLR">309</td><td id="Star4Row13col2" class="bordered textRight padLR">50</td><td id="Star4Row13col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star4Row14col0" class="bordered textLeft padLR">Alkaid</td><td id="Star4Row14col1" class="bordered textLeft padLR">153</td><td id="Star4Row14col2" class="bordered textRight padLR">49</td><td id="Star4Row14col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star4Row15col0" class="bordered textLeft padLR">CAPELLA</td><td id="Star4Row15col1" class="bordered textLeft padLR">280</td><td id="Star4Row15col2" class="bordered textRight padLR">46</td><td id="Star4Row15col3" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star4Row16col0" class="bordered textLeft padLR">DENEB</td><td id="Star4Row16col1" class="bordered textLeft padLR">049</td><td id="Star4Row16col2" class="bordered textRight padLR">45</td><td id="Star4Row16col3" class="bordered textRight padLR">1.2</td></tr><tr><td id="Star4Row17col0" class="bordered textLeft padLR">VEGA</td><td id="Star4Row17col1" class="bordered textLeft padLR">081</td><td id="Star4Row17col2" class="bordered textRight padLR">39</td><td id="Star4Row17col3" class="bordered textRight padLR">0.0</td></tr><tr><td id="Star4Row18col0" class="bordered textLeft padLR">Alpheratz</td><td id="Star4Row18col1" class="bordered textLeft padLR">358</td><td id="Star4Row18col2" class="bordered textRight padLR">29</td><td id="Star4Row18col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star4Row19col0" class="bordered textLeft padLR">Elnath</td><td id="Star4Row19col1" class="bordered textLeft padLR">278</td><td id="Star4Row19col2" class="bordered textRight padLR">29</td><td id="Star4Row19col3" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star4Row20col0" class="bordered textLeft padLR">POLLUX</td><td id="Star4Row20col1" class="bordered textLeft padLR">243</td><td id="Star4Row20col2" class="bordered textRight padLR">28</td><td id="Star4Row20col3" class="bordered textRight padLR">1.1</td></tr><tr><td id="Star4Row21col0" class="bordered textLeft padLR">Alphecca</td><td id="Star4Row21col1" class="bordered textLeft padLR">126</td><td id="Star4Row21col2" class="bordered textRight padLR">27</td><td id="Star4Row21col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star4Row22col0" class="bordered textLeft padLR">Hamal</td><td id="Star4Row22col1" class="bordered textLeft padLR">328</td><td id="Star4Row22col2" class="bordered textRight padLR">24</td><td id="Star4Row22col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star4Row23col0" class="bordered textLeft padLR">ARCTURUS</td><td id="Star4Row23col1" class="bordered textLeft padLR">146</td><td id="Star4Row23col2" class="bordered textRight padLR">19</td><td id="Star4Row23col3" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star4Row24col0" class="bordered textLeft padLR">ALDEBARAN</td><td id="Star4Row24col1" class="bordered textLeft padLR">291</td><td id="Star4Row24col2" class="bordered textRight padLR">17</td><td id="Star4Row24col3" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star4Row25col0" class="bordered textLeft padLR">Markab</td><td id="Star4Row25col1" class="bordered textLeft padLR">014</td><td id="Star4Row25col2" class="bordered textRight padLR">15</td><td id="Star4Row25col3" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star4Row26col0" class="bordered textLeft padLR">Denebola</td><td id="Star4Row26col1" class="bordered textLeft padLR">182</td><td id="Star4Row26col2" class="bordered textRight padLR">14</td><td id="Star4Row26col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star4Row27col0" class="bordered textLeft padLR">Rasalhague</td><td id="Star4Row27col1" class="bordered textLeft padLR">096</td><td id="Star4Row27col2" class="bordered textRight padLR">13</td><td id="Star4Row27col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star4Row28col0" class="bordered textLeft padLR">REGULUS</td><td id="Star4Row28col1" class="bordered textLeft padLR">208</td><td id="Star4Row28col2" class="bordered textRight padLR">12</td><td id="Star4Row28col3" class="bordered textRight padLR">1.4</td></tr><tr><td id="Star4Row29col0" class="bordered textLeft padLR">Enif</td><td id="Star4Row29col1" class="bordered textLeft padLR">034</td><td id="Star4Row29col2" class="bordered textRight padLR">10</td><td id="Star4Row29col3" class="bordered textRight padLR">2.4</td></tr><tr><td id="Star4Row30col0" class="bordered textLeft padLR">ALTAIR</td><td id="Star4Row30col1" class="bordered textLeft padLR">062</td><td id="Star4Row30col2" class="bordered textRight padLR">09</td><td id="Star4Row30col3" class="bordered textRight padLR">0.8</td></tr><tr><td id="Star4Row31col0" class="bordered textLeft padLR">BETELGEUSE</td><td id="Star4Row31col1" class="bordered textLeft padLR">271</td><td id="Star4Row31col2" class="bordered textRight padLR">07</td><td id="Star4Row31col3" class="bordered textRight padLR">1.5</td></tr><tr><td id="Star4Row32col0" class="bordered textLeft padLR">Bellatrix</td><td id="Star4Row32col1" class="bordered textLeft padLR">278</td><td id="Star4Row32col2" class="bordered textRight padLR">06</td><td id="Star4Row32col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star4Row33col0" class="bordered textLeft padLR">PROCYON</td><td id="Star4Row33col1" class="bordered textLeft padLR">245</td><td id="Star4Row33col2" class="bordered textRight padLR">05</td><td id="Star4Row33col3" class="bordered textRight padLR">0.4</td></tr><tr><td id="Star4Row34col0" class="bordered textLeft padLR">Menkar</td><td id="Star4Row34col1" class="bordered textLeft padLR">314</td><td id="Star4Row34col2" class="bordered textRight padLR">04</td><td id="Star4Row34col3" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star4Row35col0" class="bordered textLeft padLR">Alnilam</td><td id="Star4Row35col1" class="bordered textLeft padLR">276</td><td id="Star4Row35col2" class="bordered textRight padLR">-01</td><td id="Star4Row35col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star4Row36col0" class="bordered textLeft padLR">RIGEL</td><td id="Star4Row36col1" class="bordered textLeft padLR">281</td><td id="Star4Row36col2" class="bordered textRight padLR">-08</td><td id="Star4Row36col3" class="bordered textRight padLR">0.1</td></tr><tr><td id="Star4Row37col0" class="bordered textLeft padLR">Alphard</td><td id="Star4Row37col1" class="bordered textLeft padLR">218</td><td id="Star4Row37col2" class="bordered textRight padLR">-09</td><td id="Star4Row37col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star4Row38col0" class="bordered textLeft padLR">SPICA</td><td id="Star4Row38col1" class="bordered textLeft padLR">158</td><td id="Star4Row38col2" class="bordered textRight padLR">-11</td><td id="Star4Row38col3" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star4Row39col0" class="bordered textLeft padLR">Sabik</td><td id="Star4Row39col1" class="bordered textLeft padLR">102</td><td id="Star4Row39col2" class="bordered textRight padLR">-16</td><td id="Star4Row39col3" class="bordered textRight padLR">2.4</td></tr><tr><td id="Star4Row40col0" class="bordered textLeft padLR">Zuben_ubi</td><td id="Star4Row40col1" class="bordered textLeft padLR">137</td><td id="Star4Row40col2" class="bordered textRight padLR">-16</td><td id="Star4Row40col3" class="bordered textRight padLR">2.6</td></tr><tr><td id="Star4Row41col0" class="bordered textLeft padLR">SIRIUS</td><td id="Star4Row41col1" class="bordered textLeft padLR">258</td><td id="Star4Row41col2" class="bordered textRight padLR">-17</td><td id="Star4Row41col3" class="bordered textRight padLR">-1.5</td></tr><tr><td id="Star4Row42col0" class="bordered textLeft padLR">Gienah</td><td id="Star4Row42col1" class="bordered textLeft padLR">176</td><td id="Star4Row42col2" class="bordered textRight padLR">-18</td><td id="Star4Row42col3" class="bordered textRight padLR">2.5</td></tr><tr><td id="Star4Row43col0" class="bordered textLeft padLR">Diphda</td><td id="Star4Row43col1" class="bordered textLeft padLR">349</td><td id="Star4Row43col2" class="bordered textRight padLR">-18</td><td id="Star4Row43col3" class="bordered textRight padLR">2.0</td></tr><tr><td id="Star4Row44col0" class="bordered textLeft padLR">Nunki</td><td id="Star4Row44col1" class="bordered textLeft padLR">076</td><td id="Star4Row44col2" class="bordered textRight padLR">-26</td><td id="Star4Row44col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star4Row45col0" class="bordered textLeft padLR">ANTARES</td><td id="Star4Row45col1" class="bordered textLeft padLR">112</td><td id="Star4Row45col2" class="bordered textRight padLR">-26</td><td id="Star4Row45col3" class="bordered textRight padLR">1.0</td></tr><tr><td id="Star4Row46col0" class="bordered textLeft padLR">ADHARA</td><td id="Star4Row46col1" class="bordered textLeft padLR">255</td><td id="Star4Row46col2" class="bordered textRight padLR">-29</td><td id="Star4Row46col3" class="bordered textRight padLR">1.5</td></tr><tr><td id="Star4Row47col0" class="bordered textLeft padLR">FOMALHAUT</td><td id="Star4Row47col1" class="bordered textLeft padLR">015</td><td id="Star4Row47col2" class="bordered textRight padLR">-30</td><td id="Star4Row47col3" class="bordered textRight padLR">1.2</td></tr><tr><td id="Star4Row48col0" class="bordered textLeft padLR">Kaus_Aust</td><td id="Star4Row48col1" class="bordered textLeft padLR">084</td><td id="Star4Row48col2" class="bordered textRight padLR">-34</td><td id="Star4Row48col3" class="bordered textRight padLR">1.8</td></tr><tr><td id="Star4Row49col0" class="bordered textLeft padLR">Menkent</td><td id="Star4Row49col1" class="bordered textLeft padLR">148</td><td id="Star4Row49col2" class="bordered textRight padLR">-36</td><td id="Star4Row49col3" class="bordered textRight padLR">2.1</td></tr><tr><td id="Star4Row50col0" class="bordered textLeft padLR">Shaula</td><td id="Star4Row50col1" class="bordered textLeft padLR">096</td><td id="Star4Row50col2" class="bordered textRight padLR">-37</td><td id="Star4Row50col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star4Row51col0" class="bordered textLeft padLR">Acamar</td><td id="Star4Row51col1" class="bordered textLeft padLR">315</td><td id="Star4Row51col2" class="bordered textRight padLR">-40</td><td id="Star4Row51col3" class="bordered textRight padLR">2.9</td></tr><tr><td id="Star4Row52col0" class="bordered textLeft padLR">Ankaa</td><td id="Star4Row52col1" class="bordered textLeft padLR">353</td><td id="Star4Row52col2" class="bordered textRight padLR">-42</td><td id="Star4Row52col3" class="bordered textRight padLR">2.6</td></tr><tr><td id="Star4Row53col0" class="bordered textLeft padLR">Suhail</td><td id="Star4Row53col1" class="bordered textLeft padLR">223</td><td id="Star4Row53col2" class="bordered textRight padLR">-44</td><td id="Star4Row53col3" class="bordered textRight padLR">2.2</td></tr><tr><td id="Star4Row54col0" class="bordered textLeft padLR">Alnair</td><td id="Star4Row54col1" class="bordered textLeft padLR">028</td><td id="Star4Row54col2" class="bordered textRight padLR">-47</td><td id="Star4Row54col3" class="bordered textRight padLR">1.7</td></tr><tr><td id="Star4Row55col0" class="bordered textLeft padLR">CANOPUS</td><td id="Star4Row55col1" class="bordered textLeft padLR">264</td><td id="Star4Row55col2" class="bordered textRight padLR">-53</td><td id="Star4Row55col3" class="bordered textRight padLR">-0.7</td></tr><tr><td id="Star4Row56col0" class="bordered textLeft padLR">Peacock</td><td id="Star4Row56col1" class="bordered textLeft padLR">053</td><td id="Star4Row56col2" class="bordered textRight padLR">-57</td><td id="Star4Row56col3" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star4Row57col0" class="bordered textLeft padLR">ACHERNAR</td><td id="Star4Row57col1" class="bordered textLeft padLR">335</td><td id="Star4Row57col2" class="bordered textRight padLR">-57</td><td id="Star4Row57col3" class="bordered textRight padLR">0.4</td></tr><tr><td id="Star4Row58col0" class="bordered textLeft padLR">Gacrux</td><td id="Star4Row58col1" class="bordered textLeft padLR">172</td><td id="Star4Row58col2" class="bordered textRight padLR">-57</td><td id="Star4Row58col3" class="bordered textRight padLR">1.6</td></tr><tr><td id="Star4Row59col0" class="bordered textLeft padLR">Avior</td><td id="Star4Row59col1" class="bordered textLeft padLR">234</td><td id="Star4Row59col2" class="bordered textRight padLR">-60</td><td id="Star4Row59col3" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star4Row60col0" class="bordered textLeft padLR">HADAR</td><td id="Star4Row60col1" class="bordered textLeft padLR">149</td><td id="Star4Row60col2" class="bordered textRight padLR">-60</td><td id="Star4Row60col3" class="bordered textRight padLR">0.6</td></tr><tr><td id="Star4Row61col0" class="bordered textLeft padLR">RIGIL_KENT</td><td id="Star4Row61col1" class="bordered textLeft padLR">140</td><td id="Star4Row61col2" class="bordered textRight padLR">-61</td><td id="Star4Row61col3" class="bordered textRight padLR">-0.3</td></tr><tr><td id="Star4Row62col0" class="bordered textLeft padLR">ACRUX</td><td id="Star4Row62col1" class="bordered textLeft padLR">173</td><td id="Star4Row62col2" class="bordered textRight padLR">-63</td><td id="Star4Row62col3" class="bordered textRight padLR">0.7</td></tr><tr><td id="Star4Row63col0" class="bordered textLeft padLR">Atria</td><td id="Star4Row63col1" class="bordered textLeft padLR">107</td><td id="Star4Row63col2" class="bordered textRight padLR">-69</td><td id="Star4Row63col3" class="bordered textRight padLR">1.9</td></tr><tr><td id="Star4Row64col0" class="bordered textLeft padLR">Miaplacidus</td><td id="Star4Row64col1" class="bordered textLeft padLR">222</td><td id="Star4Row64col2" class="bordered textRight padLR">-70</td><td id="Star4Row64col3" class="bordered textRight padLR">1.7</td></tr></tbody></table>
+        </div>
+
+        <!-- Extra Home Page return -->
+        <div>
+            <input id="btnStarInfoJumpHomePage2" class="btnJumpHomePage padLR widthAuto" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <div class="FalsePage"></div>
+
+
+
+
+
+
+
+    <!-- LUNAR PAGE -->
+    <div id="divLunar"> <!-- Home Page Tab seeks this div id -->
+        <!-- Header -->
+        <div class="inLine"><h1>ASTRON LUNARS PAGE</h1></div>
+        <div id="calcLunarDateTimeHeader" class="inLine calc textRight padLR">Ship's Time: Wed  31 Aug 2022 05:51:39  (UTC +0.0)</div>
+        <div class="inLine background">&nbsp;</div>
+        <div class="inLine">
+            <input id="btnLunarJumpHomePage" class="btnJumpHomePage padLR" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+    </div>
+
+    <div><!-- Block for Moon, IC/HoE & Body alt tables -->
+        <!-- Moon Altitude Table -->
+        <table class="inLine">
+            <tbody><tr><!-- Row 1 -->
+                <td class="uih">Altitude (Hs)</td>
+                <td class="bordered bold">Moon</td>
+                <td class="background"></td>
+                <td class="bordered noBottomBorder">Moon</td>
+                <td class="bordered noBottomBorder">Moon</td>
+            </tr>
+            <tr><!-- Row 2 -->
+                <td class="faint">
+                    <input id="uiMoon_deg" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiMoon_Mins&#39;)" autocomplete="off">
+                    Deg</td>
+                <td class="uih">Limb</td>
+                <td id="MoonAltTableSD" class="bordered">SD: 15.5′</td>
+                <td>Apparent</td>
+                <td id="LunarMoonAltitudeLegend1">Cleared</td>
+            </tr>
+            <tr><!-- Row 3 -->
+                <td class="faint">
+                    <input id="uiMoon_Mins" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usMoonAltitudeLimb&#39;)" autocomplete="off">
+                    M.m</td>
+                <td class="uib"><select id="usMoonAltitudeLimb" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event,&#39;uiSextantArcDegrees&#39;)">
+                        <option value="UPPER">Upper</option>
+                        <option value="LOWER">Lower</option>
+                    </select></td>
+                    <td class="bordered">SD/Aug Corr</td>
+                <td class="bordered noTopBorder">Alt (Ha)</td>
+                <td id="LunarMoonAltitudeLegend2" class="bordered noTopBorder">Alt (Hcl)</td>
+            </tr>
+            <tr><!-- Row 4 -->
+                <td id="calcMoonEnteredHs" class="calc">40° 00.0′</td>
+                <td class="bordered"></td>
+                <td id="MoonAltTableSDCorr" class="calc">+15.7′</td>
+                <td id="MoonAltTableHa" class="calc">40° 12.6′</td>
+                <td id="MoonAltTableClearedAlt" class="calc">40° 55.0′</td>
+            </tr>
+            <tr><!-- Row 5 -->
+                <td id="btnUpdateMoonHs" class="background">Use calc Hs</td>
+                <td colspan="4" id="PracticeModeMoonText" class="backgroundText"></td>
+            </tr>
+        </tbody></table>
+
+        <!-- IC/HoE table -->
+        <table class="inLine">
+            <tbody><tr><!-- Row 1 -->
+                <td colspan="2" class="bordered">Both</td>
+                
+            </tr>
+            <tr><!-- Row 2 -->
+                <td id="MidTableIC" class="bordered">IC: 0.0′</td>
+                <td id="MidTableTemp" class="bordered">T: 10°C</td>
+            </tr>            
+            <tr><!-- Row 3 -->
+                <td id="MidTableHoE" class="bordered">HoE: 3.0 m.</td>
+                <td id="MidTablePress" class="bordered">P: 1010 hPa</td>
+            </tr>
+            
+            <tr><!-- Row 4 -->
+                <td id="MidTableDipCorr" class="calc">Dip Corr: -3.1′</td>
+                <td class="background"></td>
+            </tr>
+            <tr><!-- Row 5 -->
+                <td colspan="2" class="background">&nbsp;</td>
+            </tr>
+        </tbody></table>
+
+
+        <!-- Body Altitude Table -->
+        <table class="inLine">
+            <tbody><tr><!-- Row 1 -->
+                <td colspan="2" id="infoBodyNameText1" class="bordered bold">Sun</td>
+                <td class="background"></td>
+                <td id="infoBodyNameText2" class="bordered noBottomBorder">Sun</td>
+                <td id="infoBodyNameText3" class="bordered noBottomBorder">Sun</td>
+            </tr>
+            <tr><!-- Row 2 -->
+                <td class="bordered"></td>
+                <td class="bordered">Limb</td>
+                <td id="BodyAltitudeTableSD" class="bordered">SD: 15.8′</td>
+                
+                <td>Apparent </td>
+                <td>Cleared</td>
+            </tr>
+            <tr><!-- Row 3 -->
+                <td>Altitude (Hs)</td>
+                <td id="BodyAltitudeTableLimb" class="calc">Upper</td>
+                <td class="bordered">SD Corr</td>
+                <td class="bordered noTopBorder">Alt (Ha)</td>
+                <td class="bordered noTopBorder">Alt (Hcl)</td>
+            </tr>
+            <tr><!-- Row 4 -->
+                <td id="BodyAltitudeTableHs" class="calc">50° 00.0′</td>
+                <td class="bordered"></td>
+                <td id="BodyAltitudeTableSDCorr" class="calc">-15.8′</td>
+                <td id="BodyAltitudeTableHa" class="calc">49° 41.1′</td>
+                <td id="BodyAltitudeTableHcl" class="calc">49° 40.4′</td>
+            </tr>
+            <tr><!-- Row 5 -->
+                <td id="btnUpdateBodyHs" class="background">Use calc Hs</td>
+                <td colspan="4" id="PracticeModeBodyText" class="backgroundText"></td>
+            </tr>
+        </tbody></table>
+    </div>
+
+    <div>&nbsp;</div> <!-- spacer line -->
+
+    <div><!-- Lunar Table -->
+        <table>
+            <tbody><tr>
+                <!-- Row 1 -->
+                <td class="uih">Sextant Arc (LDs)</td>
+                <td class="uih">Moon</td>
+                <td id="MainTableBody" class="uih">Sun</td>
+                <td colspan="4" class="bordered bold">==== User Entered Values ====</td>
+            </tr>
+            <tr>
+                <!-- Row 2 -->
+                <td class="faint">
+                    <input id="uiSextantArcDegrees" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiSextantArcMinutes&#39;)" autocomplete="off">Deg</td>
+                <td class="uih">Limb</td>
+                <td class="uih">Limb</td>
+                <td id="MainTableDateMode1" class="bordered">Ship's Date</td>
+                <td id="MainTableTimeMode1" class="bordered">Ship's Time</td>
+                <td class="bordered">Ass Lat</td>
+                <td class="bordered">Ass Long</td>
+            </tr>
+            <tr>
+                <!-- Row 3 -->
+                <td id="MainTablemins" class="faint">
+                    <input id="uiSextantArcMinutes" class="uiWithUnit" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;usMoonArcLimb&#39;)" autocomplete="off">M.m</td>
+                <td id="MainTableMoonLimb" class="uib">
+                    <select id="usMoonArcLimb" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;usBodyArcLimb&#39;)">
+                        <option value="NEAR">Near</option>
+                        <option value="FAR">Far</option>
+                    </select></td>
+                <td id="MainTableBodyLimb" class="uib">
+                    <select id="usBodyArcLimb" class="us" size="1" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="SelectKeyDown(this, event, &#39;uiMoon_deg&#39;)">
+                        <option value="NEAR">Near</option>
+                        <option value="CENTRE">Centre</option>
+                        <option value="FAR">Far</option>
+                    </select></td>
+                <td id="MainTableEnteredDate" class="calc"> 31 Aug 2022</td>
+                <td id="MainTableEnteredTime" class="calc">05:51:39</td>
+                <td id="MainTableAssLat" class="calc">N40° 00.0′</td>
+                <td id="MainTableAssLong" class="calc">E000° 00.0′</td>
+            </tr>
+
+            <tr>
+                <!-- Row 4 -->
+                <td id="MainTableLDs" class="calc">60° 00.0′</td>
+                <td></td>
+                <td></td>
+                <td id="LRV_Text" colspan="4" class="bordered bold">==== Lunar Revised Values ====</td>
+            </tr>
+
+            <tr>
+                <!-- Row 5 -->
+                <td id="MainTableIC" class="calc">IC: 0.0′</td>
+                <td id="LunarArcMoonSDCorr" class="calc textRight padLR">SD/Aug Corr: +15.7′</td>
+                <td id="LunarArcBodySDCorr" class="calc textRight padLR">SD Corr: +15.8′</td>
+                <td id="MainTableDateMode2" class="bordered">Ship's Date</td>
+                <td id="MainTableTimeMode2" class="bordered">Ship's Time</td>
+                <td class="bordered">Calc Lat</td>
+                <td class="bordered"></td>
+            </tr>
+            <tr>
+                <!-- Row 6 -->
+                <td colspan="2" id="MainTableApparentLD" class="calc textRight padLR">Apparent Lunar Distance: 60° 31.5′</td>
+                <td></td>
+                <td id="MainTableLunarDate" class="result"></td>
+                <td id="MainTableLunarTime" class="result"></td>
+                <td id="MainTableCalcLat" class="calc"></td>
+                <td class="bordered">Calc Long</td>
+            </tr>
+            <tr>
+                <!-- Row 7 -->
+                <td colspan="2" id="MainTableClearedLD" class="calc textRight padLR">Cleared Lunar Distance: 60° 03.7′</td>
+                <td></td>
+                <td></td>
+                <td colspan="2" id="MoonLongCalcLatText" class="bordered textRight padLR">&nbsp;</td>
+                <td id="MoonLongCalcLat" class="calc"></td>
+
+            </tr>
+
+            <tr>
+                <!-- Row 8 -->
+                <td colspan="4" id="warnLunarWarnings" class="Warning bordered">WARNING: Moon below horizon.<br>WARNING: Large difference: Entered and calculated sextant arc.<br>WARNING: Large difference: Entered and calculated body altitudes.<br>WARNING: Large difference: Entered and calculated Moon altitudes.<br>WARNING: Lunar not calculated as Lunar QI below 40%.<br></td>
+                <td colspan="2" id="BodyLongCalcLatText" class="bordered textRight padLR">&nbsp;</td>
+                <td id="BodyLongCalcLat" class="calc"></td>
+            </tr>
+
+            <tr>
+                <!-- Row 9 -->
+                <td colspan="4" id="cautLunarCautions" class="Caution"></td>
+                <td id="MoonLongAssLatText" colspan="2" class="bordered textRight padLR">&nbsp;</td>
+                <td id="MoonLongAssLat" class="calc"></td>
+            </tr>
+
+            <tr>
+                <!-- Row 10 -->
+                <td colspan="4" id="advLunarAdvisories" class="Caution">ADVISORY: Moon lower limb not illuminated. Illum. angle 027°<br></td>
+                <td id="BodyLongAssLatText" colspan="2" class="bordered textRight padLR">&nbsp;</td>
+                <td id="BodyLongAssLat" class="calc"></td>
+            </tr>
+
+            <tr>
+                <!-- Row 11 -->
+                <td colspan="7" id="infoLunarInformation" class="bordered textLeft padLR">SUPPLEMENTARY INFORMATION<br>Quality Indices: &nbsp;&nbsp;&nbsp;Alignment: 97%.&nbsp;&nbsp;&nbsp;Lunar: 0%.&nbsp;&nbsp;&nbsp;Calc Lat: 32%.&nbsp;&nbsp;&nbsp;Moon Longitude: 0%. &nbsp;&nbsp;&nbsp;Sun Longitude: 0%.<br>Lunar QI reduced due low Sun altitude. (04°)<br>Moon orbital direction at Mer Pass: 116° . Relative angle of Sun to Moon's motion: 7°.<br>Moon phase is 15%, waxing. Sun lunar distance is increasing. <br>Moon: GHA: 224° 35.2′, Dec: S07° 28.8′, Refr Corr: -1.2′, HP: 57.0′, Px Corr: 43.6′<br>Sun: GHA: 267° 48.4′, Dec: N08° 38.0′, Refr Corr: -0.8′, HP: 0.1′, Px Corr: 0.1′<br></td>
+            </tr>
+
+            <tr>
+                <!-- Row 12A -->
+                <td colspan="3" id="infoCalcMoonHs" class="bordered textLeft tabL">Altitude not calculated. Moon below horizon.</td>
+                <td rowspan="4" colspan="4" id="infoCalcValuesText" class="bordered textLeft padLR">The predicted values on the left are only valid when entered date,<br>time, assumed position, IC, HoE, Temp, Press and limbs are all accurate.<br>They can be used for pre-setting sextant and for lunar practice with no <br>horizon or when inputs preclude valid time/longitude calculation.</td>
+            </tr>
+
+            <tr>
+                <!-- Row 12B -->
+                <td colspan="3" id="infoCalcBodyHs" class="bordered textLeft tabL">Predicted Sun sextant altitude (Hs) is 04° 22.1′.</td>
+            </tr>
+
+            <tr>
+                <!-- Row 12C -->
+                <td colspan="3" id="infoCalcLDs" class="bordered textLeft tabL">Sextant arc not calculated. Moon below horizon.</td>
+            </tr>
+
+            <tr>
+                <!-- Row 12D -->
+                <td colspan="3" id="infoArcError" class="bordered textLeft tabL bold"></td>
+            </tr>
+
+            <tr>
+                <!-- Row 13 -->
+                <td colspan="3" class="bordered"> </td>
+                <td colspan="2" class="bordered">
+                    <input type="button" id="btnUpdateTime" value=" " autocomplete="off" class="hidden"></td>
+                <td colspan="2" class="bordered">
+                    <input type="button" id="btnPlotLunarLoP" class="hidden" value="Plot Lunar Line of Position" autocomplete="off"></td>
+            </tr>
+
+            <tr>
+                <!-- Row 14 -->
+                <td colspan="7" id="MainTableLunarFooter" class="bordered textLeft padLR">Lunar Quality over 60% triggers Home Page pop-up.<br></td>
+            </tr>
+        </tbody></table>
+    </div>
+
+    <div class="FalsePage"></div>
+
+
+    <!-- MER PASSAGE PAGE -->
+    <div id="divMerPassage"> <!-- location.href from Home Page tab -->
+        <!-- Header line-->
+        <div><h1>ASTRON MERIDIAN PASSAGE PAGE</h1></div>
+        <!-- Next Line-->
+        <div id="calcMerPassDateTime" class="inLine calc padLR">Ship's Time: Wed  31 Aug 2022 05:51:39  (UTC +0.0)</div>  <!-- Date / time -->
+        <div class="inLine">&nbsp;</div>
+        <div class="inLine">    <!-- Home page button -->
+            <input id="btnMerPassJumpHomePage" class="btnJumpHomePage padLR" type="button" value="Return to Home Page (Alt+h)" autocomplete="off">
+        </div>
+
+        <div>&nbsp;</div> <!-- spacer line -->
+
+        <table>
+            <tbody><tr>
+                <td class="bold padL textLeft" colspan="8" id="MerPassageTopRow">Entered Data: Sun(U) Max sextant altitude 50° 00.0′, observed at 05:51:39 Ship's Time.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IC: 0.0′, HoE: 3.0 m, T: 10°C, P: 1010 hPa.</td>
+            </tr>
+            <tr>
+                <td colspan="5" rowspan="2" class="bordered width60pc"> <!-- 60% for these 5 cols-->
+                    Corrections for observer movement and <br>
+                    rate of change of body declination
+                </td>
+                <td colspan="3" id="infoMerPassCulminationHeader" class="bordered bold padLR">Entered data invalid for Meridian Passage</td>    <!-- thus 40% for these 3 cols-->
+            </tr>
+            <tr>
+                <!-- td 1st 5 cols due rowspan. Above widths also set to lower rows-->
+                <td id="calcUncorrectedTime" class="calc">&nbsp;</td>
+                <td id="calcUncorrectedLat" class="calc"></td>
+                <td id="calcUncorrectedLong" class="calc"></td>
+            </tr>
+            <tr>
+                <td class="bordered" rowspan="2">COG<br>(degs T)</td>
+                <td class="bordered" rowspan="2">SOG<br>(knots)</td>
+                <td class="bordered padLR" rowspan="2">Dec Rate<br>(mins/hour)</td>
+                <td class="bordered padLR" rowspan="2">Observer<br>Northings</td>
+                <td class="bordered padLR" rowspan="2">Time<br>Correction</td>
+                <td colspan="3"></td>
+            </tr>
+            <tr>
+                <!-- Blank row (td colspan="5" absent due rowspan above) -->
+                <td colspan="3"></td>
+            </tr>
+            <tr>
+                <td class="uib">
+                    <input id="uiMerPassCOG" class="ui" onblur="InputBlur(this)" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiMerPassSOG&#39;)" autocomplete="off">
+                </td>
+                <td class="uib">
+                    <input id="uiMerPassSOG" class="ui" onblur="SetSOGStyles()" onfocus="InputFocus(this)" onkeydown="InputKeyDown(this, event, &#39;uiMerPassCOG&#39;)" autocomplete="off" style="color: black; background-color: coral; font-weight: normal;">
+                </td>
+                <td id="calcDecRate" class="calc">-0.9′</td>
+                <td id="calcNorthRate" class="calc">0.0 knots</td>
+                <td id="calcTimeCorr" class="calc"></td>
+                <td id="infoTimeBaseHeader" class="bordered padLR">Ship's Time</td>
+                <td class="bordered">Latitude</td>
+                <td class="bordered">Longitude</td>
+                
+            </tr>
+            <tr>
+                <td colspan="5"></td>
+                <td colspan="3" id="infoMerPassCorrectedPositionHeader" class="bold bordered"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4" id="infoMerPassTransitHeader" class="bold bordered padR textRight"></td>
+                <td id="resCorrTime" class="result">&nbsp;&nbsp;</td>
+                <td id="resCorrLat" class="result"></td>
+                <td id="resCorrLong" class="result"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4" id="infoPrevHourHeader" class="bordered padR textRight"></td>
+                <td id="calcPrevHourTime" class="calc">&nbsp;&nbsp;</td>
+                <td id="calcPrevHourLat" class="calc"></td>
+                <td id="calcPrevHourLong" class="calc"></td>
+            </tr>
+            <tr>
+                <td></td><td colspan="4" id="infoCorrCulminationHeader" class="bordered padR textRight"></td>
+                <td id="calcCorrCulTime" class="calc">&nbsp;&nbsp;</td>
+                <td id="calcCorrCulLat" class="calc"></td>
+                <td id="calcCorrCulLong" class="calc"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4" id="infoNextHourHeader" class="bordered padR textRight"></td>
+                <td id="calcNextHourTime" class="calc">&nbsp;&nbsp;</td>
+                <td id="calcNextHourLat" class="calc"></td>
+                <td id="calcNextHourLong" class="calc"></td>
+            </tr>
+            <tr>    <!-- Blank row -->
+                <td colspan="8">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="8" id="MerPassInputWarning" class="Warning">WARNING: Home Page inputs not valid for a Meridian Passage sight for Sun</td>
+            </tr>
+            <tr>
+                <td colspan="8" id="CautMerPass" class="Caution">CAUTION: Large Difference: Observed and Calculated altitudes<br></td>
+            </tr>
+            <tr>
+                <td colspan="8" id="MerPassNotes" class="bordered textLeft padLR">See User Notes Section 11 for detailed explanation.<br>Supplementary Information:<br>Sun GHA Rate: 15° 00.2′ per hour</td>
+            </tr>
+        </tbody></table>
+    </div>
+
+
+    <!-- Large blank area after last page -->
+    <div class="FalsePage"></div>
+
+<div id="UMS_TOOLTIP" style="position: absolute; cursor: pointer; z-index: 2147483647; background: transparent; top: -100000px; left: -100000px;"></div></body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration><umsdataelement id="UMSSendDataEventElement"></umsdataelement><div id="tmtoolbar_manual_rating_injected" style="display: none;">init</div></html>

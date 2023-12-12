@@ -1,0 +1,170 @@
+/* ///////////////////////////////////////////////////////
+//
+// File Astron.css
+//
+// ///////////////////////////////////////////////////////*/
+
+/* ====== Global elements ======*/
+* {box-sizing: border-box;}
+
+/* ====== HTML elements ====== */
+body {
+    background: Gray; /* General 'page' background and gap between 'pages' */
+    border: 0;
+    color: black;
+    font-family: Arial, sans-serif;
+    font-size: 100%;
+    height: 90%;
+    padding: 0;
+    text-align: center;}
+button {border: 2px solid Black;}    
+h1 {color: LightCyan; margin-right: 20px; } /* Page Header. (margin permits following items) */
+input {border: 0; font-size:inherit; padding: 0; width: 100%; height: 100%;}
+input[type="button"] {border: 2px solid Black;}
+select {border: 0; font-size:inherit; height: 100%;}
+table {
+    background: LightCyan;
+    border: 0;
+    border-collapse: collapse;
+    margin: auto;   /* centralise */
+    padding: 0;    
+} 
+/* tr, td {border: 0;} // Redundant .. inherited from table */
+    
+
+/* ====== Bespoke classes */
+.Caution {border: 1px solid Gray; color: Black; font-weight: bold; padding-left: 5px; text-align: left;}
+.CloseUserNotes { float: right;}
+.cvsPhaseImage {vertical-align: middle;} /* PhaseImageCanvas */
+.divJupiterPopUp {background: White; border: 5px solid Black; border-radius: 20px;
+    left: 40%; padding: 5px;  top: 35%; position: absolute; }
+    /* absolute, left, top required as <divJupiterPopUp> not within <tblHomePage> */
+.divUserNotes {background: White; border: 5px solid Black; border-radius: 20px;
+    font-size:120%; left: 30%; padding: 5px; text-align: left; top: 0%; position: absolute;}
+    /* absolute, left, top required as <divJupiterPopUp> not within <tblHomePage> */
+.FalseBorder {background:Yellow; height: 10px;}
+    /* Top & Bottom 'apparent' border. Actually a table row. Colour as Home Page Border. */
+.FalsePage {height: 2000px;}
+    /* Large blank div between pseudo pages. */
+.GoogleMap {height:400px; margin: auto; width:600px; }
+.Header2 {border: 0; font-size:110%; font-weight: bold;}
+.HomePage { position: absolute; left: 0; top: 0; height: 100%;  width: 100%;
+           border: solid Yellow; border-width: 0 15px 0 15px;}
+.HomePageLoading {width: 1200px; height: 800px; color: White; font-size: 2em; font-weight: 400;}
+.HomePageReady {visibility: hidden;}
+.LunarPossibleHomePage {color: Coral; font-weight: bold; padding-right: 5px; text-align: right;}
+.LunarPossiblePlannerPage {background: Gray; border: 1px solid Gray; color: PeachPuff;}
+.MerPassPossible {color: Green; font-weight: bold; padding-right: 5px; text-align: right;}
+.MoonInDaylightText {background: GoldenRod; color: Black; border: 1px solid Gray;}
+.ResultWarning {background: LightGreen; border: 1px solid Gray; color: Red; font-weight: bold;
+    padding-left: 5px;  }
+.Setting {background:LightCyan; color: Blue;}
+.SettingHeaderBackground {background:PeachPuff; color: #0000ff;}
+.SunInDaylightText {background: Yellow; color: Black; border: 1px solid Gray;}
+.SunAtNightText, .MoonAtNightText {background: Gray; color: White; border: 1px solid Gray;}
+    /* border in other colours, and no border, give ragged effects!!*/
+.TimeSyncWarning {background: Red; border: 0; color: White; }
+.Warning {border: 0; color: Red; font-weight: bold; padding-left: 5px; text-align: left;}
+
+/* ====== Classes for cells showing intermediate & final results */
+.calc {background: LightGreen; border: 1px solid Gray;}
+.result {background: Green; border: 1px solid Black; color: White;}
+
+/* ====== Classes for user Input and Select cells */
+.faint {background: Coral; border: 1px solid Gray; color:DarkSlateGray;}    /* add 'units legend' within .ui cell.*/
+.ui {background:Coral; border: 0; text-align: center; width: 100%;}             /* User input cell (main sequence)*/
+.uib {background: Coral; border: 1px solid Gray;}                             /* User input Background */
+.uih {background: PeachPuff; border: 1px solid Gray; color: Black;}         /* User input Header */
+    /* Header cell adjacent to input or select */
+.btn {background: PeachPuff; border: 1px solid Gray; color: Black;}         /* Header coloured buttons */
+.uis {background: PeachPuff; border: 0; text-align: center; width: 100%;}       /* User input cell (subsidiary) */
+.uihWarning {background: PeachPuff; border: 1px solid Gray; color: Red;}
+.uiWithUnit { background:Coral; border: 0; padding-right: 3px;
+    text-align: right; width: 4em;}   /* User Input with Unit: cell shared with .faint text */
+.us {background: Coral;} /* User Select cell. Same colour as .ui */
+
+/* ====== Classes for compound cell styling, usually unnamed cells within tables */
+/* Alignment */
+.central {margin: 0 auto;}
+.inLine {display: inline-block;}
+.textCentre {text-align: center;}
+.textLeft {text-align: left;}
+.textRight {text-align: right;}
+.textLastRight {text-align-last: right;}
+.vAlignBottom {vertical-align: bottom;}
+.vAlignMiddle {vertical-align: middle;}
+.vAlignTop {vertical-align: top;}
+/* Backgrounds */
+.background {background: Gray; border: 1px solid Gray; color: Grey;}
+    /* Grey makes text invisible */
+.backgroundText {background:Gray; border: 1px solid Gray; color: White; text-align: left;}
+    /* White text on grey background */
+.whiteText {background:Gray; color: White; display:inline-block;}
+    /* White text on grey background */
+
+/* Borders */
+.bordered {border: 1px solid Gray;}
+.borderedWhite {border: 1px solid White;}
+.borderBottom {border-bottom: 1px solid Gray;}
+.borderBottomThick {border-bottom: 3px solid Gray;}
+.borderLeft {border-left: 1px solid Gray;}
+.borderLeftThick {border-left: 3px solid Gray;}
+.borderRight {border-right: 1px solid Gray;}
+.borderTop {border-top: 1px solid Gray;}
+.borderTopThick {border-top: 3px solid Gray;}
+.borderThick {border: 3px solid Gray;}
+.noBorders {border: 0;}
+.noBottomBorder {border-bottom: 0;}
+.noLeftBorder {border-left: 0;}
+.noRightBorder {border-right: 0;}
+.noTopBorder {border-top: 0;}
+.borderStrong {border: 3px solid Black;}
+
+/* Fonts */
+.bold {font-weight: bold;}
+.smallText {font-size: 80%;}
+.faded {color: Grey;}
+/* Sizing */
+
+.heightTestCells {height: 7px;}
+.height100pc {height: 100%;}
+.widthAuto {width: auto;}
+.width10pc {width: 10%;}
+.width20pc {width: 20%;}
+.width25pc {width: 25%;}
+.width50pc {width: 50%;}
+.width60pc {width: 60%;}
+.width70pc {width: 70%;}
+.width80pc {width: 80%;}
+.width90pc {width: 90%;}
+.width100pc {width: 100%}
+.width600px {width: 600px;}
+
+/* Spacing */
+.padded {padding: 5px;}
+.padLR {padding-left: 5px; padding-right: 5px;}
+.padL {padding-left: 5px;}
+.padR {padding-right: 5px;}
+.tabL {padding-left: 30px;}
+.tabR {padding-right: 30px;}
+
+/* Visibility */
+.hidden {visibility: hidden;}
+.visible {visibility: visible;}
+
+/* ====== Buttons (navigation) ======*/
+.btnJumpHomePage {background: Coral;}                      /* Colour as .ui */
+.btnJumpSightLog {background:Green; color: White;}       /* Colour as .result */
+.btnAddSight {background:Green; color: White;}           /* Colour as .result */
+.btnFadedAddSight {background: LightCyan; color:LightGray;}
+.btnJumpPlanner {background:Gray; color: White;}
+.btnJumpAlmanac {background:PowderBlue; color: Black;}
+.btnJumpSettings {background: LightCyan;  color: Blue;}  /* Colour as .Setting */
+.btnJumpStarInfo {background:LightCyan; color: Black;}
+.btnJumpMerPass {background: LightCyan; color: Green; font-weight: bold;} /* Colour as .MerPassPossible */
+.btnJumpLunar {background:LightCyan;  color: Coral; font-weight: bold;}   /* Colour as .LunarPossibleHomePage */
+
+/* ====== Buttons (other) ======*/
+.btnUserNotes {background: Yellow;}
+.btnHomePageSetPresentTime {background:PeachPuff; color: Black;}
+.btnResetSettings {background: Coral;} 
